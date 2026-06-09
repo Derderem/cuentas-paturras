@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuenta Clara - Grupos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #1a262b; color: white; }
+        .card { background-color: #24343a; border-radius: 1rem; }
+        .input-field { background-color: white; color: black; border-radius: 0.5rem; padding: 0.5rem; width: 100%; }
+        .btn-primary { background-color: #0d6e5c; color: white; font-weight: bold; transition: 0.3s; }
+        .btn-primary:hover { background-color: #148c7a; }
+        .accent-yellow { color: #facc15; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+        <div class="flex items-center gap-2 bg-yellow-400 text-black px-3 py-1 rounded-full font-bold text-sm">
+            📁 Mi grupo
+        </div>
+        <button class="btn-primary px-4 py-2 rounded-full text-sm">+ Nuevo</button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Columna Izquierda: Hero y Resumen -->
+        <div class="lg:col-span-2 space-y-6">
+            <div class="card p-8 relative overflow-hidden">
+                <div class="inline-block bg-gray-700 text-xs px-3 py-1 rounded-full mb-4">✨ Repartos exactos, sin discusiones</div>
+                <h1 class="text-5xl font-extrabold mb-4">Cuenta Clara <br><span class="accent-yellow">para grupos.</span></h1>
+                <p class="text-gray-400 mb-8 max-w-md">Crea un grupo, apunta cada compra con su ticket y descubre al instante quién debe pagar a quién.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-[#1a262b] p-4 rounded-xl">
+                        <p class="text-gray-400 text-xs">Total gastado</p>
+                        <p id="total-gastado" class="text-2xl font-bold">0,00 €</p>
+                    </div>
+                    <div class="bg-[#1a262b] p-4 rounded-xl">
+                        <p class="text-gray-400 text-xs">Por persona</p>
+                        <p id="por-persona" class="text-2xl font-bold">0,00 €</p>
+                    </div>
+                    <div class="bg-[#1a262b] p-4 rounded-xl">
+                        <p class="text-gray-400 text-xs">Movimientos</p>
+                        <p id="total-movimientos" class="text-2xl font-bold">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Integrantes -->
+            <div class="card p-6">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2">👥 Integrantes</h2>
+                <div class="flex gap-2 mb-4">
+                    <input id="nuevo-integrante" type="text" placeholder="Nuevo integrante" class="input-field">
+                    <button onclick="addMember()" class="bg-yellow-400 text-black px-4 py-2 rounded-lg font-bold">+</button>
+                </div>
+                <div id="lista-integrantes" class="space-y-3">
+                    <!-- Aquí se cargan los integrantes -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna Derecha: Formulario y Deudas -->
+        <div class="space-y-6">
+            <!-- Añadir Gasto -->
+            <div class="bg-white text-black p-6 rounded-3xl">
+                <h2 class="text-2xl font-bold mb-4">Añadir gasto</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs font-bold text-gray-500 uppercase">Compra</label>
+                        <input id="gasto-descripcion" type="text" placeholder="Cena, súper, gasolina..." class="input-field border border-gray-200">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs font-bold text-gray-500 uppercase">Importe</label>
+                            <input id="gasto-importe" type="number" placeholder="42,50" class="input-field border border-gray-200">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-gray-500 uppercase">Pagó</label>
+                            <select id="gasto-pago" class="input-field border border-gray-200">
+                                <!-- Se llena dinámicamente -->
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-500 uppercase">Ticket (foto o PDF)</label>
+                        <div class="border-2 border-dashed border-gray-300 p-4 rounded-lg text-center text-sm text-gray-500 cursor-pointer hover:bg-gray-50">
+                            ⬆️ Subir ticket (JPG, PNG, PDF)
+                        </div>
+                    </div>
+                    <button onclick="addExpense()" class="btn-primary w-full py-3 rounded-xl shadow-lg">+ Guardar gasto</button>
+                </div>
+            </div>
+
+            <!-- Quién paga a quién -->
+            <div class="card p-6">
+                <h2 class="text-xl font-bold mb-4">Quién paga a quién</h2>
+                <div id="deudas-container" class="bg-green-100 text-green-800 p-4 rounded-xl text-center font-medium">
+                    ✅ Todos están en paz.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURACIÓN DE SUPABASE
+        const SUPABASE_URL = 'TU_URL_DE_SUPABASE';
+        const SUPABASE_KEY = 'TU_KEY_DE_SUPABASE';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Lógica de la App
+        async function loadData() {
+            // 1. Cargar Integrantes
+            const { data: members } = await supabase.from('integrantes').select('*');
+            const lista = document.getElementById('lista-integrantes');
+            const select = document.getElementById('gasto-pago');
+            
+            lista.innerHTML = '';
+            select.innerHTML = '';
+
+            members.forEach(m => {
+                lista.innerHTML += `
+                    <div class="flex justify-between items-center bg-[#1a262b] p-3 rounded-lg">
+                        <div class="flex items-center gap-3">
+                            <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+                            <span class="font-medium">${m.nombre}</span>
+                        </div>
+                        <span class="font-bold text-green-400">+0,00 €</span>
+                    </div>`;
+                select.innerHTML += `<option value="${m.id}">${m.nombre}</option>`;
+            });
+
+            // 2. Cargar Gastos y calcular totales
+            const { data: expenses } = await supabase.from('gastos').select('*');
+            const total = expenses.reduce((acc, curr) => acc + parseFloat(curr.importe), 0);
+            document.getElementById('total-gastado').innerText = total.toFixed(2) + ' €';
+            document.getElementById('total-movimientos').innerText = expenses.length;
+            document.getElementById('por-persona').innerText = (total / (members.length || 1)).toFixed(2) + ' €';
+        }
+
+        async function addMember() {
+            const nombre = document.getElementById('nuevo-integrante').value;
+            if(!nombre) return;
+            await supabase.from('integrantes').insert([{ nombre }]);
+            document.getElementById('nuevo-integrante').value = '';
+            loadData();
+        }
+
+        async function addExpense() {
+            const descripcion = document.getElementById('gasto-descripcion').value;
+            const importe = document.getElementById('gasto-importe').value;
+            const pagado_por = document.getElementById('gasto-pago').value;
+
+            if(!descripcion || !importe || !pagado_por) return alert('Rellena todo');
+
+            await supabase.from('gastos').insert([{ 
+                descripcion, 
+                importe: parseFloat(importe), 
+                pagado_por 
+            }]);
+            
+            alert('Gasto guardado');
+            loadData();
+        }
+
+        // Iniciar app
+        loadData();
+    </script>
+</body>
+</html>
