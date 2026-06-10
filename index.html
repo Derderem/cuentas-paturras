@@ -1,199 +1,82 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cuenta Clara - Grupos</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #1a262b; color: white; }
-        .card { background-color: #24343a; border-radius: 1rem; }
-        .input-field { background-color: white; color: black; border-radius: 0.5rem; padding: 0.5rem; width: 100%; }
-        .btn-primary { background-color: #0d6e5c; color: white; font-weight: bold; transition: 0.3s; }
-        .btn-primary:hover { background-color: #148c7a; }
-        .accent-yellow { color: #facc15; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuenta Clara - Grupos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #1a262b; color: white; }
+    .card { background-color: #24343a; border-radius: 1rem; }
+    .input-field { background-color: white; color: black; border-radius: 0.5rem; padding: 0.5rem; width: 100%; }
+    .btn-primary { background-color: #0d6d5c; color: white; font-weight: bold; transition: 0.3s; }
+    .btn-primary:hover { background-color: #148c7a; }
+    .accent-yellow { color: #facc15; }
+  </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-8">
-    <div id="grupo-actual" class="flex items-center gap-2 bg-yellow-400 text-black px-3 py-1 rounded-full font-bold text-sm">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-8">
+    <div class="flex items-center gap-2 bg-yellow-400 text-black px-3 py-1 rounded-full font-bold text-sm">
       📁 <span id="nombre-grupo">Sin grupo</span>
     </div>
-    <div>
-      <button onclick="createGroup()" class="btn-primary px-4 py-2 rounded-full text-sm">+ Nuevo</button>
-    </div>
-</div>
+    <button onclick="createGroup()" class="btn-primary px-4 py-2 rounded-full text-sm">+ Nuevo</button>
+  </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-        <!-- Columna Izquierda: Hero y Resumen -->
-        <div class="lg:col-span-2 space-y-6">
-            <div class="card p-8 relative overflow-hidden flex flex-col gap-8">
-
-                <!-- Texto y Pato -->
-                <div class="flex flex-row items-center justify-between gap-2 md:gap-6">
-                    <div class="text-left z-10 flex-1">
-                        <h1 class="text-3xl md:text-6xl font-extrabold mb-1 md:mb-2 text-white leading-none">Cuenta Clara</h1>
-                        <h2 class="text-2xl md:text-6xl font-extrabold mb-3 md:mb-6 accent-yellow leading-none">para grupos</h2>
-                        <p class="text-white font-bold text-sm md:text-xl max-w-md leading-tight opacity-90">
-                            Crea un grupo, apunta cada compra con su ticket y descubre al instante quien paga a quien.
-                        </p>
-                    </div>
-                    <div class="relative flex-shrink-0">
-                        <img src="logo-pato.png" alt="Cuentas Paturras" class="w-36 md:w-72 h-auto drop-shadow-2xl">
-                    </div>
-                </div>
-
-                <!-- Cuadros de Totales -->
-                <div class="grid grid-cols-3 gap-2 md:gap-4">
-                    <div class="bg-[#1a262b] p-3 md:p-6 rounded-2xl border border-gray-700">
-                        <p class="text-gray-400 text-xs md:text-sm font-semibold mb-1">Total gastado</p>
-                        <p id="total-gastado" class="text-lg md:text-4xl font-black text-white">0,00 €</p>
-                    </div>
-                    <div class="bg-[#1a262b] p-3 md:p-6 rounded-2xl border border-gray-700">
-                        <p class="text-gray-400 text-xs md:text-sm font-semibold mb-1">Por persona</p>
-                        <p id="por-persona" class="text-lg md:text-4xl font-black text-white">0,00 €</p>
-                    </div>
-                    <div class="bg-[#1a262b] p-3 md:p-6 rounded-2xl border border-gray-700">
-                        <p class="text-gray-400 text-xs md:text-sm font-semibold mb-1">Movimientos</p>
-                        <p id="total-movimientos" class="text-lg md:text-4xl font-black text-white">0</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Integrantes -->
-            <div class="card p-6">
-                <h2 class="text-xl font-bold mb-4 flex items-center gap-2">👥 Integrantes</h2>
-                <div class="flex gap-2 mb-4">
-                    <input id="nuevo-integrante" type="text" placeholder="Nuevo integrante" class="input-field">
-                    <button onclick="addMember()" class="bg-yellow-400 text-black px-4 py-2 rounded-lg font-bold">+</button>
-                </div>
-                <div id="lista-integrantes" class="space-y-3">
-                </div>
-            </div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-6">
+      <div class="card p-4 md:p-8 flex flex-col gap-6">
+        <!-- HERO -->
+        <div class="flex flex-row items-start justify-between gap-3">
+          <div class="flex-1">
+            <h1 class="text-5xl md:text-6xl font-extrabold leading-none">Cuenta Clara</h1>
+            <h2 class="text-3xl md:text-5xl font-extrabold mb-4 accent-yellow leading-none">para grupos</h2>
+            <p class="font-bold text-xl leading-tight opacity-90 max-w-[280px]">Crea un grupo, apunta cada compra con su ticket y descubre al instante quien paga a quien.</p>
+          </div>
+          <img src="logo-pato.png" class="w-40 md:w-72 h-auto drop-shadow-2xl" alt="pato">
         </div>
-
-        <!-- Columna Derecha: Formulario y Deudas -->
-        <div class="space-y-6">
-            <!-- Añadir Gasto -->
-            <div class="bg-white text-black p-6 rounded-3xl">
-                <h2 class="text-2xl font-bold mb-4">Añadir gasto</h2>
-                <div class="space-y-4">
-                    <div>
-                        <label class="text-xs font-bold text-gray-500 uppercase">Compra</label>
-                        <input id="gasto-descripcion" type="text" placeholder="Cena, súper, gasolina..." class="input-field border border-gray-200">
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="text-xs font-bold text-gray-500 uppercase">Importe</label>
-                            <input id="gasto-importe" type="number" placeholder="42,50" class="input-field border border-gray-200">
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold text-gray-500 uppercase">Pagó</label>
-                            <select id="gasto-pago" class="input-field border border-gray-200">
-                            </select>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="text-xs font-bold text-gray-500 uppercase">Ticket (foto o PDF)</label>
-                        <div class="border-2 border-dashed border-gray-300 p-4 rounded-lg text-center text-sm text-gray-500 cursor-pointer hover:bg-gray-50">
-                            📎 Subir ticket (JPG, PNG, PDF)
-                        </div>
-                    </div>
-                    <button onclick="addExpense()" class="btn-primary w-full py-3 rounded-xl shadow-lg">+ Guardar gasto</button>
-                </div>
-            </div>
-
-            <!-- Quién paga a quién -->
-            <div class="card p-6">
-                <h2 class="text-xl font-bold mb-4">Quién paga a quién</h2>
-                <div id="deudas-container" class="bg-green-100 text-green-800 p-4 rounded-xl text-center font-medium">
-                    ✅ Todos están en paz.
-                </div>
-            </div>
+        <!-- TOTALES -->
+        <div class="grid grid-cols-3 gap-3">
+          <div class="bg-[#1a262b] p-4 rounded-2xl border border-gray-700"><p class="text-gray-300 text-sm">Total gastado</p><p id="total-gastado" class="text-3xl font-black">0,00 €</p></div>
+          <div class="bg-[#1a262b] p-4 rounded-2xl border border-gray-700"><p class="text-gray-300 text-sm">Por persona</p><p id="por-persona" class="text-3xl font-black">0,00 €</p></div>
+          <div class="bg-[#1a262b] p-4 rounded-2xl border border-gray-700"><p class="text-gray-300 text-sm">Movimientos</p><p id="total-movimientos" class="text-3xl font-black">0</p></div>
         </div>
+      </div>
+
+      <!-- INTEGRANTES -->
+      <div class="card p-6">
+        <h2 class="text-xl font-bold mb-4">👥 Integrantes</h2>
+        <div class="flex gap-2 mb-4">
+          <input id="nuevo-integrante" type="text" placeholder="Nuevo integrante" class="input-field">
+          <button onclick="addMember()" class="bg-yellow-400 text-black px-4 py-2 rounded-lg font-bold">+</button>
+        </div>
+        <div id="lista-integrantes" class="space-y-2"></div>
+      </div>
     </div>
 
-    <script>
-        // CONFIGURACIÓN DE SUPABASE
-        const SUPABASE_URL = 'https://tnlsxnuavtofejejoydq.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_Rw6AYK30Yhr4tY7DeA81NA_0hz9171D';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    <!-- DERECHA -->
+    <div class="space-y-6">
+      <div class="bg-white text-black p-6 rounded-3xl">
+        <h2 class="text-2xl font-bold mb-4">Añadir gasto</h2>
+        <div class="space-y-3">
+          <input id="gasto-descripcion" type="text" placeholder="Cena, súper..." class="input-field border">
+          <div class="grid grid-cols-2 gap-3">
+            <input id="gasto-importe" type="number" placeholder="42.50" class="input-field border">
+            <select id="gasto-pago" class="input-field border"></select>
+          </div>
+          <button onclick="addExpense()" class="btn-primary w-full py-3 rounded-xl">+ Guardar gasto</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  let currentGroupId = localStorage.getItem('grupo_id');
-  let currentGroupName = localStorage.getItem('grupo_nombre') || 'Sin grupo';
-
-  async function loadData() {
-    document.getElementById('nombre-grupo').innerText = currentGroupName;
-    
-    if (!currentGroupId) {
-      document.getElementById('lista-integrantes').innerHTML = '';
-      document.getElementById('gasto-pago').innerHTML = '';
-      return;
-    }
-
-    // 1. Cargar Integrantes
-    const { data: members } = await supabase.from('integrantes').select('*').eq('grupo_id', currentGroupId);
-    const lista = document.getElementById('lista-integrantes');
-    const select = document.getElementById('gasto-pago');
-    lista.innerHTML = '';
-    select.innerHTML = '<option value="">¿Quién pagó?</option>';
-
-    members.forEach(m => {
-      lista.innerHTML += `<div class="flex justify-between items-center bg-[#1a262b] p-3 rounded-lg"><div class="flex items-center gap-3"><div class="w-3 h-3 rounded-full bg-blue-500"></div><span>${m.nombre}</span></div></div>`;
-      select.innerHTML += `<option value="${m.id}">${m.nombre}</option>`;
-    });
-
-    // 2. Cargar Gastos
-    const { data: expenses } = await supabase.from('gastos').select('*').eq('grupo_id', currentGroupId);
-    const total = expenses.reduce((acc, curr) => acc + parseFloat(curr.importe), 0);
-    document.getElementById('total-gastado').innerText = total.toFixed(2) + ' €';
-    document.getElementById('total-movimientos').innerText = expenses.length;
-    document.getElementById('por-persona').innerText = (members.length ? (total / members.length) : 0).toFixed(2) + ' €';
-  }
-
-  async function createGroup() {
-    const nombre = prompt('Nombre del grupo:');
-    if (!nombre) return;
-    const { data, error } = await supabase.from('grupos').insert({ nombre }).select().single();
-    if (error) return alert('Error al crear grupo: ' + error.message);
-    
-    currentGroupId = data.id;
-    currentGroupName = data.nombre;
-    localStorage.setItem('grupo_id', currentGroupId);
-    localStorage.setItem('grupo_nombre', currentGroupName);
-    loadData();
-  }
-
-  async function addMember() {
-    if(!currentGroupId) return alert('Crea un grupo primero con + Nuevo');
-    const nombre = document.getElementById('nuevo-integrante').value;
-    if(!nombre) return;
-    await supabase.from('integrantes').insert({ nombre, grupo_id: currentGroupId });
-    document.getElementById('nuevo-integrante').value = '';
-    loadData();
-  }
-
-  async function addExpense() {
-    if(!currentGroupId) return alert('Crea un grupo primero');
-    const descripcion = document.getElementById('gasto-descripcion').value;
-    const importe = document.getElementById('gasto-importe').value;
-    const pagado_por = document.getElementById('gasto-pago').value;
-    if(!descripcion || !importe || !pagado_por) return alert('Rellena todo');
-    await supabase.from('gastos').insert({ descripcion, importe: parseFloat(importe), pagado_por, grupo_id: currentGroupId });
-    alert('Gasto guardado');
-    loadData();
-  }
-
-  loadData();
 <script>
   const SUPABASE_URL = 'https://tnlsxnuavtofejejoydq.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_Rw6AYK30Yhr4tY7DeA81NA_0hz9171D';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   let currentGroupId = localStorage.getItem('grupo_id');
   let currentGroupName = localStorage.getItem('grupo_nombre') || 'Sin grupo';
@@ -202,41 +85,39 @@
     document.getElementById('nombre-grupo').innerText = currentGroupName;
     if (!currentGroupId) return;
 
-    const { data: members } = await supabase.from('integrantes').select('*').eq('grupo_id', currentGroupId);
+    const { data: members } = await db.from('integrantes').select('*').eq('grupo_id', currentGroupId);
     const lista = document.getElementById('lista-integrantes');
     const select = document.getElementById('gasto-pago');
-    lista.innerHTML = ''; 
-    select.innerHTML = '<option value="">¿Quién pagó?</option>';
+    lista.innerHTML = ''; select.innerHTML = '<option value="">¿Quién pagó?</option>';
     
     members.forEach(m => {
-      lista.innerHTML += `<div class="flex justify-between items-center bg-[#1a262b] p-3 rounded-lg"><span>${m.nombre}</span></div>`;
+      lista.innerHTML += `<div class="bg-[#1a262b] p-3 rounded-lg">${m.nombre}</div>`;
       select.innerHTML += `<option value="${m.id}">${m.nombre}</option>`;
     });
 
-    const { data: expenses } = await supabase.from('gastos').select('*').eq('grupo_id', currentGroupId);
-    const total = expenses.reduce((acc, c) => acc + parseFloat(c.importe), 0);
+    const { data: expenses } = await db.from('gastos').select('*').eq('grupo_id', currentGroupId);
+    const total = expenses.reduce((a, c) => a + parseFloat(c.importe), 0);
     document.getElementById('total-gastado').innerText = total.toFixed(2) + ' €';
     document.getElementById('total-movimientos').innerText = expenses.length;
-    document.getElementById('por-persona').innerText = (members.length ? total/members.length : 0).toFixed(2) + ' €';
+    document.getElementById('por-persona').innerText = (members.length ? total / members.length : 0).toFixed(2) + ' €';
   }
 
   async function createGroup() {
-    const nombre = prompt('Nombre del nuevo grupo:');
+    const nombre = prompt('Nombre del grupo:');
     if (!nombre) return;
-    const { data, error } = await supabase.from('grupos').insert({ nombre }).select().single();
-    if (error) return alert('Error: ' + error.message);
-    currentGroupId = data.id;
-    currentGroupName = data.nombre;
+    const { data, error } = await db.from('grupos').insert({ nombre }).select().single();
+    if (error) { alert('Error: ' + error.message); return; }
+    currentGroupId = data.id; currentGroupName = data.nombre;
     localStorage.setItem('grupo_id', currentGroupId);
     localStorage.setItem('grupo_nombre', currentGroupName);
     loadData();
   }
 
   async function addMember() {
-    if(!currentGroupId) return alert('Primero crea un grupo con + Nuevo');
+    if (!currentGroupId) return alert('Primero pulsa + Nuevo');
     const nombre = document.getElementById('nuevo-integrante').value;
-    if(!nombre) return;
-    await supabase.from('integrantes').insert({ nombre, grupo_id: currentGroupId });
+    if (!nombre) return;
+    await db.from('integrantes').insert({ nombre, grupo_id: currentGroupId });
     document.getElementById('nuevo-integrante').value = '';
     loadData();
   }
@@ -245,8 +126,8 @@
     const descripcion = document.getElementById('gasto-descripcion').value;
     const importe = document.getElementById('gasto-importe').value;
     const pagado_por = document.getElementById('gasto-pago').value;
-    if(!descripcion || !importe || !pagado_por) return alert('Rellena todo');
-    await supabase.from('gastos').insert({ descripcion, importe, pagado_por, grupo_id: currentGroupId });
+    if (!descripcion || !importe || !pagado_por) return alert('Rellena todo');
+    await db.from('gastos').insert({ descripcion, importe: parseFloat(importe), pagado_por, grupo_id: currentGroupId });
     loadData();
   }
 
