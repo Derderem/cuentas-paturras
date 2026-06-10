@@ -20,49 +20,49 @@
 
     <!-- Header -->
     <div class="flex justify-between items-center mb-8">
-        <div class="flex items-center gap-2 bg-yellow-400 text-black px-3 py-1 rounded-full font-bold text-sm">
-            📁 Mi grupo
+        <div class="flex items-center gap-2 bg-yellow-400 text-black px-3 py-1 rounded-full font-bold text-sm cursor-pointer" onclick="loadData()">
+            📁 <span id="grupo-nombre">Sin grupo</span>
         </div>
-        <button class="btn-primary px-4 py-2 rounded-full text-sm">+ Nuevo</button>
+        <button class="btn-primary px-4 py-2 rounded-full text-sm" onclick="nuevoGrupo()">+ Nuevo</button>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         <!-- Columna Izquierda: Hero y Resumen -->
         <div class="lg:col-span-2 space-y-6">
-                <!-- Bloque Principal: Título, Pato y Totales -->
-               <div class="card p-4 md:p-8 relative overflow-hidden flex flex-col gap-6">
-                    
-                    <!-- Parte Superior: Texto y Pato -->
-<div class="flex flex-row items-center justify-between gap-2 md:gap-6">
-    <div class="text-left z-10 flex-1">
-        <h1 class="text-3xl md:text-6xl font-extrabold mb-1 md:mb-2 text-white leading-none">Cuenta Clara</h1>
-        <h2 class="text-2xl md:text-6xl font-extrabold mb-3 md:mb-6 accent-yellow leading-none">para grupos</h2>
-        <p class="text-white font-bold text-sm md:text-xl max-w-md leading-tight opacity-90">
-            Crea un grupo, apunta cada compra con su ticket y descubre al instante quien paga a quien.
-        </p>
-    </div>
+            <div class="card p-8 relative overflow-hidden flex flex-col gap-8">
 
-    <div class="relative flex-shrink-0">
-        <img src="logo-pato.png" alt="Cuentas Paturras" class="w-36 md:w-72 h-auto drop-shadow-2xl">
-    </div>
-</div>
+                <!-- Texto y Pato -->
+                <div class="flex flex-row items-center justify-between gap-2 md:gap-6">
+                    <div class="text-left z-10 flex-1">
+                        <h1 class="text-3xl md:text-6xl font-extrabold mb-1 md:mb-2 text-white leading-none">Cuenta Clara</h1>
+                        <h2 class="text-2xl md:text-6xl font-extrabold mb-3 md:mb-6 accent-yellow leading-none">para grupos</h2>
+                        <p class="text-white font-bold text-sm md:text-xl max-w-md leading-tight opacity-90">
+                            Crea un grupo, apunta cada compra con su ticket y descubre al instante quien paga a quien.
+                        </p>
+                    </div>
+                    <div class="relative flex-shrink-0">
+                        <img src="logo-pato.png" alt="Cuentas Paturras" class="w-36 md:w-72 h-auto drop-shadow-2xl">
+                    </div>
+                </div>
 
-<!-- Parte Inferior: Cuadros de Totales -->
-<div class="grid grid-cols-3 gap-2 md:gap-4">
-    <div class="bg-[#1a262b] p-3 md:p-6 rounded-2xl border border-gray-700">
-        <p class="text-gray-400 text-xs md:text-sm font-semibold mb-1">Total gastado</p>
-        <p id="total-gastado" class="text-lg md:text-4xl font-black text-white">0,00 €</p>
-    </div>
-    <div class="bg-[#1a262b] p-3 md:p-6 rounded-2xl border border-gray-700">
-        <p class="text-gray-400 text-xs md:text-sm font-semibold mb-1">Por persona</p>
-        <p id="por-persona" class="text-lg md:text-4xl font-black text-white">0,00 €</p>
-    </div>
-    <div class="bg-[#1a262b] p-3 md:p-6 rounded-2xl border border-gray-700">
-        <p class="text-gray-400 text-xs md:text-sm font-semibold mb-1">Movimientos</p>
-        <p id="total-movimientos" class="text-lg md:text-4xl font-black text-white">0</p>
-    </div>
-</div>
+                <!-- Cuadros de Totales -->
+                <div class="grid grid-cols-3 gap-2 md:gap-4">
+                    <div class="bg-[#1a262b] p-3 md:p-6 rounded-2xl border border-gray-700">
+                        <p class="text-gray-400 text-xs md:text-sm font-semibold mb-1">Total gastado</p>
+                        <p id="total-gastado" class="text-lg md:text-4xl font-black text-white">0,00 €</p>
+                    </div>
+                    <div class="bg-[#1a262b] p-3 md:p-6 rounded-2xl border border-gray-700">
+                        <p class="text-gray-400 text-xs md:text-sm font-semibold mb-1">Por persona</p>
+                        <p id="por-persona" class="text-lg md:text-4xl font-black text-white">0,00 €</p>
+                    </div>
+                    <div class="bg-[#1a262b] p-3 md:p-6 rounded-2xl border border-gray-700">
+                        <p class="text-gray-400 text-xs md:text-sm font-semibold mb-1">Movimientos</p>
+                        <p id="total-movimientos" class="text-lg md:text-4xl font-black text-white">0</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Integrantes -->
             <div class="card p-6">
                 <h2 class="text-xl font-bold mb-4 flex items-center gap-2">👥 Integrantes</h2>
@@ -71,7 +71,6 @@
                     <button onclick="addMember()" class="bg-yellow-400 text-black px-4 py-2 rounded-lg font-bold">+</button>
                 </div>
                 <div id="lista-integrantes" class="space-y-3">
-                    <!-- Aquí se cargan los integrantes -->
                 </div>
             </div>
         </div>
@@ -94,14 +93,13 @@
                         <div>
                             <label class="text-xs font-bold text-gray-500 uppercase">Pagó</label>
                             <select id="gasto-pago" class="input-field border border-gray-200">
-                                <!-- Se llena dinámicamente -->
                             </select>
                         </div>
                     </div>
                     <div>
                         <label class="text-xs font-bold text-gray-500 uppercase">Ticket (foto o PDF)</label>
                         <div class="border-2 border-dashed border-gray-300 p-4 rounded-lg text-center text-sm text-gray-500 cursor-pointer hover:bg-gray-50">
-                            ⬆️ Subir ticket (JPG, PNG, PDF)
+                            📎 Subir ticket (JPG, PNG, PDF)
                         </div>
                     </div>
                     <button onclick="addExpense()" class="btn-primary w-full py-3 rounded-xl shadow-lg">+ Guardar gasto</button>
@@ -122,65 +120,229 @@
         // CONFIGURACIÓN DE SUPABASE
         const SUPABASE_URL = 'https://tnlsxnuavtofejejoydq.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_Rw6AYK3OYhr4tY7DeA8lNA_0hz9171D';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const { createClient } = supabase;
+        const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Lógica de la App
-        async function loadData() {
-            // 1. Cargar Integrantes
-            const { data: members } = await supabase.from('integrantes').select('*');
-            const lista = document.getElementById('lista-integrantes');
-            const select = document.getElementById('gasto-pago');
-            
-            lista.innerHTML = '';
-            select.innerHTML = '';
+        // Estado de la app
+        let currentGroupId = localStorage.getItem('currentGroupId');
 
-            members.forEach(m => {
-                lista.innerHTML += `
-                    <div class="flex justify-between items-center bg-[#1a262b] p-3 rounded-lg">
-                        <div class="flex items-center gap-3">
-                            <div class="w-3 h-3 rounded-full bg-blue-500"></div>
-                            <span class="font-medium">${m.nombre}</span>
-                        </div>
-                        <span class="font-bold text-green-400">+0,00 €</span>
-                    </div>`;
-                select.innerHTML += `<option value="${m.id}">${m.nombre}</option>`;
-            });
-
-            // 2. Cargar Gastos y calcular totales
-            const { data: expenses } = await supabase.from('gastos').select('*');
-            const total = expenses.reduce((acc, curr) => acc + parseFloat(curr.importe), 0);
-            document.getElementById('total-gastado').innerText = total.toFixed(2) + ' €';
-            document.getElementById('total-movimientos').innerText = expenses.length;
-            document.getElementById('por-persona').innerText = (total / (members.length || 1)).toFixed(2) + ' €';
+        // =====================
+        // INICIAR APP
+        // =====================
+        async function init() {
+            if (currentGroupId) {
+                const { data } = await db.from('grupos').select('*').eq('id', currentGroupId).single();
+                if (data) {
+                    document.getElementById('grupo-nombre').textContent = data.nombre;
+                    loadData();
+                    return;
+                }
+            }
+            document.getElementById('grupo-nombre').textContent = 'Sin grupo';
         }
 
+        // =====================
+        // CREAR NUEVO GRUPO
+        // =====================
+        async function nuevoGrupo() {
+            const nombre = prompt('Nombre del nuevo grupo:');
+            if (!nombre) return;
+
+            const { data, error } = await db.from('grupos').insert([{ nombre }]).select().single();
+            if (error) {
+                alert('Error al crear grupo: ' + error.message);
+                console.error(error);
+                return;
+            }
+
+            currentGroupId = data.id;
+            localStorage.setItem('currentGroupId', currentGroupId);
+            document.getElementById('grupo-nombre').textContent = data.nombre;
+            loadData();
+            alert('✅ Grupo "' + nombre + '" creado. ¡Añade integrantes!');
+        }
+
+        // =====================
+        // CARGAR DATOS
+        // =====================
+        async function loadData() {
+            if (!currentGroupId) return;
+
+            // 1. Cargar Integrantes
+            const { data: members } = await db
+                .from('integrantes')
+                .select('*')
+                .eq('grupo_id', currentGroupId);
+
+            const lista = document.getElementById('lista-integrantes');
+            const select = document.getElementById('gasto-pago');
+
+            lista.innerHTML = '';
+            select.innerHTML = '<option value="">Seleccionar...</option>';
+
+            if (members) {
+                members.forEach(m => {
+                    lista.innerHTML += `
+                        <div class="flex justify-between items-center bg-[#1a262b] p-3 rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <div class="w-3 h-3 rounded-full" style="background-color: ${m.color || '#3b82f6'}"></div>
+                                <span class="font-medium">${m.nombre}</span>
+                            </div>
+                        </div>`;
+                    select.innerHTML += `<option value="${m.id}">${m.nombre}</option>`;
+                });
+            }
+
+            // 2. Cargar Gastos y calcular totales
+            const { data: expenses } = await db
+                .from('gastos')
+                .select('*')
+                .eq('grupo_id', currentGroupId);
+
+            const total = expenses ? expenses.reduce((acc, curr) => acc + parseFloat(curr.importe), 0) : 0;
+            const numMembers = members ? members.length : 0;
+
+            document.getElementById('total-gastado').innerText = total.toFixed(2) + ' €';
+            document.getElementById('total-movimientos').innerText = expenses ? expenses.length : 0;
+            document.getElementById('por-persona').innerText = (total / (numMembers || 1)).toFixed(2) + ' €';
+
+            // 3. Calcular deudas
+            if (members && expenses) {
+                calcularDeudas(members, expenses);
+            }
+        }
+
+        // =====================
+        // AÑADIR INTEGRANTE
+        // =====================
         async function addMember() {
-            const nombre = document.getElementById('nuevo-integrante').value;
-            if(!nombre) return;
-            await supabase.from('integrantes').insert([{ nombre }]);
+            if (!currentGroupId) {
+                alert('Primero crea un grupo con el botón "+ Nuevo"');
+                return;
+            }
+
+            const nombre = document.getElementById('nuevo-integrante').value.trim();
+            if (!nombre) return alert('Escribe un nombre');
+
+            const colors = ['#3b82f6', '#ef4444', '#22c55e', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4'];
+            const { data: existing } = await db
+                .from('integrantes')
+                .select('id')
+                .eq('grupo_id', currentGroupId);
+            const color = colors[(existing ? existing.length : 0) % colors.length];
+
+            const { error } = await db.from('integrantes').insert([{
+                nombre,
+                grupo_id: currentGroupId,
+                color
+            }]);
+
+            if (error) {
+                alert('Error: ' + error.message);
+                console.error(error);
+                return;
+            }
+
             document.getElementById('nuevo-integrante').value = '';
             loadData();
         }
 
+        // =====================
+        // AÑADIR GASTO
+        // =====================
         async function addExpense() {
-            const descripcion = document.getElementById('gasto-descripcion').value;
+            if (!currentGroupId) {
+                alert('Primero crea un grupo');
+                return;
+            }
+
+            const descripcion = document.getElementById('gasto-descripcion').value.trim();
             const importe = document.getElementById('gasto-importe').value;
             const pagado_por = document.getElementById('gasto-pago').value;
 
-            if(!descripcion || !importe || !pagado_por) return alert('Rellena todo');
+            if (!descripcion || !importe || !pagado_por) return alert('Rellena todos los campos');
 
-            await supabase.from('gastos').insert([{ 
-                descripcion, 
-                importe: parseFloat(importe), 
-                pagado_por 
+            const { error } = await db.from('gastos').insert([{
+                descripcion,
+                importe: parseFloat(importe),
+                pagado_por,
+                grupo_id: currentGroupId
             }]);
-            
-            alert('Gasto guardado');
+
+            if (error) {
+                alert('Error: ' + error.message);
+                console.error(error);
+                return;
+            }
+
+            document.getElementById('gasto-descripcion').value = '';
+            document.getElementById('gasto-importe').value = '';
+            document.getElementById('gasto-pago').value = '';
+
+            alert('✅ Gasto guardado');
             loadData();
         }
 
-        // Iniciar app
-        loadData();
+        // =====================
+        // CALCULAR DEUDAS
+        // =====================
+        function calcularDeudas(members, expenses) {
+            const container = document.getElementById('deudas-container');
+
+            if (!members.length || !expenses.length) {
+                container.innerHTML = '✅ Todos están en paz.';
+                container.className = 'bg-green-100 text-green-800 p-4 rounded-xl text-center font-medium';
+                return;
+            }
+
+            const total = expenses.reduce((acc, e) => acc + parseFloat(e.importe), 0);
+            const porPersona = total / members.length;
+
+            const pagado = {};
+            members.forEach(m => pagado[m.id] = 0);
+            expenses.forEach(e => {
+                if (pagado[e.pagado_por] !== undefined) {
+                    pagado[e.pagado_por] += parseFloat(e.importe);
+                }
+            });
+
+            const deudores = [];
+            const acreedores = [];
+            members.forEach(m => {
+                const diff = pagado[m.id] - porPersona;
+                if (diff < -0.01) deudores.push({ nombre: m.nombre, amount: Math.abs(diff) });
+                if (diff > 0.01) acreedores.push({ nombre: m.nombre, amount: diff });
+            });
+
+            deudores.sort((a, b) => b.amount - a.amount);
+            acreedores.sort((a, b) => b.amount - a.amount);
+
+            let html = '';
+            let i = 0, j = 0;
+
+            while (i < deudores.length && j < acreedores.length) {
+                const amount = Math.min(deudores[i].amount, acreedores[j].amount);
+                html += `<div class="flex justify-between items-center bg-[#1a262b] p-3 rounded-lg mb-2 text-white">
+                    <span>💸 ${deudores[i].nombre} → ${acreedores[j].nombre}</span>
+                    <span class="font-bold text-yellow-400">${amount.toFixed(2)} €</span>
+                </div>`;
+                deudores[i].amount -= amount;
+                acreedores[j].amount -= amount;
+                if (deudores[i].amount < 0.01) i++;
+                if (acreedores[j].amount < 0.01) j++;
+            }
+
+            if (html) {
+                container.innerHTML = html;
+                container.className = 'space-y-1';
+            } else {
+                container.innerHTML = '✅ Todos están en paz.';
+                container.className = 'bg-green-100 text-green-800 p-4 rounded-xl text-center font-medium';
+            }
+        }
+
+        // Iniciar
+        init();
     </script>
 </body>
 </html>
