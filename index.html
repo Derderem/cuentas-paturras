@@ -34,20 +34,22 @@
                 <div class="card p-8 relative overflow-hidden flex flex-col gap-8">
                     
                     <!-- Parte Superior: Texto y Pato -->
-                    <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-                        <div class="text-left z-10">
-                            <h1 class="text-6xl font-extrabold mb-2 text-white leading-none">Cuenta Clara</h1>
-                            <h2 class="text-6xl font-extrabold mb-6 accent-yellow leading-none">para grupos</h2>
-                            <p class="text-white font-bold text-xl max-w-md leading-tight opacity-90">
-                                Crea un grupo, apunta cada compra con su ticket y descubre al instante quien paga a quien.
-                            </p>
-                        </div>
-                        
-                        <div class="relative">
-                            <!-- Si tu imagen se llama logo-pato.png.png, cambia el src aquí abajo -->
-                            <img src="logo-pato.png" alt="Cuentas Paturras" class="w-72 h-auto drop-shadow-2xl">
-                        </div>
-                    </div>
+<div class="flex flex-col lg:flex-row items-center justify-between gap-8">
+  <div class="text-left z-10 flex-1">
+    <h1 class="text-5xl sm:text-6xl font-extrabold mb-2 text-white leading-none">Cuenta Clara</h1>
+    <h2 class="text-5xl sm:text-6xl font-extrabold mb-6 accent-yellow leading-none">para grupos</h2>
+    <p class="text-white font-bold text-lg sm:text-xl max-w-md leading-tight opacity-90">
+      Crea un grupo, apunta cada compra con su ticket y descubre al instante quien paga a quien.
+    </p>
+  </div>
+
+  <!-- Imagen del Pato -->
+  <div class="relative flex-shrink-0 pt-4 lg:pt-0">
+    <img src="logo-pato.png" 
+         alt="Cuentas Paturras" 
+         class="w-64 sm:w-80 lg:w-72 h-auto drop-shadow-2xl">
+  </div>
+</div>
 
                     <!-- Parte Inferior: Cuadros de Totales -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -136,7 +138,7 @@
 
     <script>
         // CONFIGURACIÓN DE SUPABASE
-        cconst SUPABASE_URL = 'https://tnlsxnuavtofejejoydq.supabase.co';
+        const SUPABASE_URL = 'https://tnlsxnuavtofejejoydq.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_Rw6AYK3OYhr4tY7DeA8lNA_0hz9171D';
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
