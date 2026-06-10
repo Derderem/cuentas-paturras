@@ -29,29 +29,52 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         <!-- Columna Izquierda: Hero y Resumen -->
-        <div class="card p-8 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
-    <div class="text-left z-10">
-        <div class="inline-block bg-gray-700 text-xs px-3 py-1 rounded-full mb-4">✨ Repartos exactos, sin discusiones</div>
-        <h1 class="text-4xl font-extrabold mb-4 leading-tight">Cuenta Clara <br><span class="accent-yellow">para grupos.</span></h1>
-        <p class="text-gray-400 mb-6 max-w-sm text-sm">Crea un grupo, apunta cada compra con su ticket y descubre al instante quién debe pagar a quién.</p>
-    </div>
-    
-    <div class="relative">
-        <img src="logo-pato.png" alt="Cuentas Paturras" class="w-48 h-auto drop-shadow-2xl">
-    </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-[#1a262b] p-4 rounded-xl">
-                        <p class="text-gray-400 text-xs">Total gastado</p>
-                        <p id="total-gastado" class="text-2xl font-bold">0,00 €</p>
+        <div class="lg:col-span-2 space-y-6">
+                <!-- Bloque Principal: Título, Pato y Totales -->
+                <div class="card p-8 relative overflow-hidden flex flex-col gap-8">
+                    
+                    <!-- Parte Superior: Texto y Pato -->
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div class="text-left z-10">
+                            <h1 class="text-6xl font-extrabold mb-2 text-white leading-none">Cuenta Clara</h1>
+                            <h2 class="text-6xl font-extrabold mb-6 accent-yellow leading-none">para grupos</h2>
+                            <p class="text-white font-bold text-xl max-w-md leading-tight opacity-90">
+                                Crea un grupo, apunta cada compra con su ticket y descubre al instante quien paga a quien.
+                            </p>
+                        </div>
+                        
+                        <div class="relative">
+                            <!-- Si tu imagen se llama logo-pato.png.png, cambia el src aquí abajo -->
+                            <img src="logo-pato.png" alt="Cuentas Paturras" class="w-72 h-auto drop-shadow-2xl">
+                        </div>
                     </div>
-                    <div class="bg-[#1a262b] p-4 rounded-xl">
-                        <p class="text-gray-400 text-xs">Por persona</p>
-                        <p id="por-persona" class="text-2xl font-bold">0,00 €</p>
+
+                    <!-- Parte Inferior: Cuadros de Totales -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-[#1a262b] p-6 rounded-2xl border border-gray-700">
+                            <p class="text-gray-400 text-sm font-semibold mb-1">Total gastado</p>
+                            <p id="total-gastado" class="text-4xl font-black text-white">0,00 €</p>
+                        </div>
+                        <div class="bg-[#1a262b] p-6 rounded-2xl border border-gray-700">
+                            <p class="text-gray-400 text-sm font-semibold mb-1">Por persona</p>
+                            <p id="por-persona" class="text-4xl font-black text-white">0,00 €</p>
+                        </div>
+                        <div class="bg-[#1a262b] p-6 rounded-2xl border border-gray-700">
+                            <p class="text-gray-400 text-sm font-semibold mb-1">Movimientos</p>
+                            <p id="total-movimientos" class="text-4xl font-black text-white">0</p>
+                        </div>
                     </div>
-                    <div class="bg-[#1a262b] p-4 rounded-xl">
-                        <p class="text-gray-400 text-xs">Movimientos</p>
-                        <p id="total-movimientos" class="text-2xl font-bold">0</p>
+                </div>
+
+                <!-- Sección de Integrantes (Se mantiene igual) -->
+                <div class="card p-6">
+                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">👥 Integrantes</h2>
+                    <div class="flex gap-2 mb-4">
+                        <input id="nuevo-integrante" type="text" placeholder="Nuevo integrante" class="input-field">
+                        <button onclick="addMember()" class="bg-yellow-400 text-black px-4 py-2 rounded-lg font-bold">+</button>
+                    </div>
+                    <div id="lista-integrantes" class="space-y-3">
+                        <!-- Aquí se cargan los integrantes -->
                     </div>
                 </div>
             </div>
