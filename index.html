@@ -20,11 +20,13 @@
 
     <!-- Header -->
     <div class="flex justify-between items-center mb-8">
-        <div class="flex items-center gap-2 bg-yellow-400 text-black px-3 py-1 rounded-full font-bold text-sm cursor-pointer" onclick="loadData()">
-            📁 <span id="grupo-nombre">Sin grupo</span>
-        </div>
-        <button class="btn-primary px-4 py-2 rounded-full text-sm" onclick="nuevoGrupo()">+ Nuevo</button>
+    <div id="grupo-actual" class="flex items-center gap-2 bg-yellow-400 text-black px-3 py-1 rounded-full font-bold text-sm">
+      📁 <span id="nombre-grupo">Sin grupo</span>
     </div>
+    <div>
+      <button onclick="createGroup()" class="btn-primary px-4 py-2 rounded-full text-sm">+ Nuevo</button>
+    </div>
+</div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
@@ -188,67 +190,67 @@
   }
 
   loadData();
+<script>
+  const SUPABASE_URL = 'https://tnlsxnuavtofejejoydq.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_Rw6AYK30Yhr4tY7DeA81NA_0hz9171D';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let currentGroupId = localStorage.getItem('grupo_id');
+  let currentGroupName = localStorage.getItem('grupo_nombre') || 'Sin grupo';
+
+  async function loadData() {
+    document.getElementById('nombre-grupo').innerText = currentGroupName;
+    if (!currentGroupId) return;
+
+    const { data: members } = await supabase.from('integrantes').select('*').eq('grupo_id', currentGroupId);
+    const lista = document.getElementById('lista-integrantes');
+    const select = document.getElementById('gasto-pago');
+    lista.innerHTML = ''; 
+    select.innerHTML = '<option value="">¿Quién pagó?</option>';
+    
+    members.forEach(m => {
+      lista.innerHTML += `<div class="flex justify-between items-center bg-[#1a262b] p-3 rounded-lg"><span>${m.nombre}</span></div>`;
+      select.innerHTML += `<option value="${m.id}">${m.nombre}</option>`;
+    });
+
+    const { data: expenses } = await supabase.from('gastos').select('*').eq('grupo_id', currentGroupId);
+    const total = expenses.reduce((acc, c) => acc + parseFloat(c.importe), 0);
+    document.getElementById('total-gastado').innerText = total.toFixed(2) + ' €';
+    document.getElementById('total-movimientos').innerText = expenses.length;
+    document.getElementById('por-persona').innerText = (members.length ? total/members.length : 0).toFixed(2) + ' €';
+  }
+
+  async function createGroup() {
+    const nombre = prompt('Nombre del nuevo grupo:');
+    if (!nombre) return;
+    const { data, error } = await supabase.from('grupos').insert({ nombre }).select().single();
+    if (error) return alert('Error: ' + error.message);
+    currentGroupId = data.id;
+    currentGroupName = data.nombre;
+    localStorage.setItem('grupo_id', currentGroupId);
+    localStorage.setItem('grupo_nombre', currentGroupName);
+    loadData();
+  }
+
+  async function addMember() {
+    if(!currentGroupId) return alert('Primero crea un grupo con + Nuevo');
+    const nombre = document.getElementById('nuevo-integrante').value;
+    if(!nombre) return;
+    await supabase.from('integrantes').insert({ nombre, grupo_id: currentGroupId });
+    document.getElementById('nuevo-integrante').value = '';
+    loadData();
+  }
+
+  async function addExpense() {
+    const descripcion = document.getElementById('gasto-descripcion').value;
+    const importe = document.getElementById('gasto-importe').value;
+    const pagado_por = document.getElementById('gasto-pago').value;
+    if(!descripcion || !importe || !pagado_por) return alert('Rellena todo');
+    await supabase.from('gastos').insert({ descripcion, importe, pagado_por, grupo_id: currentGroupId });
+    loadData();
+  }
+
+  loadData();
 </script>
-        // =====================
-        // CALCULAR DEUDAS
-        // =====================
-        function calcularDeudas(members, expenses) {
-            const container = document.getElementById('deudas-container');
-
-            if (!members.length || !expenses.length) {
-                container.innerHTML = '✅ Todos están en paz.';
-                container.className = 'bg-green-100 text-green-800 p-4 rounded-xl text-center font-medium';
-                return;
-            }
-
-            const total = expenses.reduce((acc, e) => acc + parseFloat(e.importe), 0);
-            const porPersona = total / members.length;
-
-            const pagado = {};
-            members.forEach(m => pagado[m.id] = 0);
-            expenses.forEach(e => {
-                if (pagado[e.pagado_por] !== undefined) {
-                    pagado[e.pagado_por] += parseFloat(e.importe);
-                }
-            });
-
-            const deudores = [];
-            const acreedores = [];
-            members.forEach(m => {
-                const diff = pagado[m.id] - porPersona;
-                if (diff < -0.01) deudores.push({ nombre: m.nombre, amount: Math.abs(diff) });
-                if (diff > 0.01) acreedores.push({ nombre: m.nombre, amount: diff });
-            });
-
-            deudores.sort((a, b) => b.amount - a.amount);
-            acreedores.sort((a, b) => b.amount - a.amount);
-
-            let html = '';
-            let i = 0, j = 0;
-
-            while (i < deudores.length && j < acreedores.length) {
-                const amount = Math.min(deudores[i].amount, acreedores[j].amount);
-                html += `<div class="flex justify-between items-center bg-[#1a262b] p-3 rounded-lg mb-2 text-white">
-                    <span>💸 ${deudores[i].nombre} → ${acreedores[j].nombre}</span>
-                    <span class="font-bold text-yellow-400">${amount.toFixed(2)} €</span>
-                </div>`;
-                deudores[i].amount -= amount;
-                acreedores[j].amount -= amount;
-                if (deudores[i].amount < 0.01) i++;
-                if (acreedores[j].amount < 0.01) j++;
-            }
-
-            if (html) {
-                container.innerHTML = html;
-                container.className = 'space-y-1';
-            } else {
-                container.innerHTML = '✅ Todos están en paz.';
-                container.className = 'bg-green-100 text-green-800 p-4 rounded-xl text-center font-medium';
-            }
-        }
-
-        // Iniciar
-        init();
-    </script>
 </body>
 </html>
