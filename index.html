@@ -19,9 +19,12 @@
 <body class="p-4 md:p-8">
 
   <!-- Header -->
-  <div class="flex justify-between items-center mb-8 gap-2">
-  <div class="flex items-center gap-2 bg-yellow-400 text-black px-3 py-1 rounded-full font-bold text-sm">
-    📁 <span id="nombre-grupo">Sin grupo</span>
+  <div class="flex justify-between items-center mb-8 gap-2 flex-wrap">
+  <div class="flex items-center gap-2 bg-yellow-400 text-black px-3 py-2 rounded-full font-bold text-sm">
+    📁
+    <select id="selector-grupo" onchange="changeGroup()" class="bg-yellow-400 text-black font-bold outline-none">
+      <option value="">Sin grupo</option>
+    </select>
   </div>
 
   <div class="flex gap-2">
@@ -122,8 +125,6 @@
   let currentGroupName = localStorage.getItem('grupo_nombre') || 'Sin grupo';
 
   async function loadData() {
-    document.getElementById('nombre-grupo').innerText = currentGroupName;
-
     if (!currentGroupId) {
       document.getElementById('lista-integrantes').innerHTML = '';
       document.getElementById('gasto-pago').innerHTML = '<option value="">¿Quién pagó?</option>';
@@ -172,32 +173,71 @@
     document.getElementById('por-persona').innerText = ((members && members.length) ? total / members.length : 0).toFixed(2) + ' €';
   }
 
-  async function createGroup() {
-    const nombre = prompt('Nombre del grupo:');
-    if (!nombre || !nombre.trim()) return;
+  async function loadGroups() {
+  const { data: groups, error } = await db.from('grupos').select('*').order('created_at', { ascending: true });
 
-    const { data, error } = await db
-      .from('grupos')
-      .insert({ nombre: nombre.trim() })
-      .select()
-      .single();
-
-    if (error) {
-      alert('Error: ' + error.message);
-      return;
-    }
-
-    currentGroupId = data.id;
-    currentGroupName = data.nombre;
-
-    localStorage.setItem('grupo_id', currentGroupId);
-    localStorage.setItem('grupo_nombre', currentGroupName);
-
-    loadData();
+  if (error) {
+    alert('Error cargando grupos: ' + error.message);
+    return;
   }
 
+  const selector = document.getElementById('selector-grupo');
+  selector.innerHTML = '<option value="">Sin grupo</option>';
+
+  groups.forEach(group => {
+    selector.innerHTML += `<option value="${group.id}">${group.nombre}</option>`;
+  });
+
+  if (currentGroupId) {
+    selector.value = currentGroupId;
+  }
+}
+
+  function changeGroup() {
+  const selector = document.getElementById('selector-grupo');
+  const selectedOption = selector.options[selector.selectedIndex];
+
+  currentGroupId = selector.value || null;
+  currentGroupName = selector.value ? selectedOption.text : 'Sin grupo';
+
+  if (currentGroupId) {
+    localStorage.setItem('grupo_id', currentGroupId);
+    localStorage.setItem('grupo_nombre', currentGroupName);
+  } else {
+    localStorage.removeItem('grupo_id');
+    localStorage.removeItem('grupo_nombre');
+  }
+
+  loadData();
+}
+  
+  async function createGroup() {
+  const nombre = prompt('Nombre del grupo:');
+  if (!nombre || !nombre.trim()) return;
+
+  const { data, error } = await db
+    .from('grupos')
+    .insert({ nombre: nombre.trim() })
+    .select()
+    .single();
+
+  if (error) {
+    alert('Error: ' + error.message);
+    return;
+  }
+
+  currentGroupId = data.id;
+  currentGroupName = data.nombre;
+
+  localStorage.setItem('grupo_id', currentGroupId);
+  localStorage.setItem('grupo_nombre', currentGroupName);
+
+  await loadGroups();
+  loadData();
+}
+
   async function deleteGroup() {
-  if (!currentGroupId) return alert('No hay grupo para eliminar');
+  if (!currentGroupId) return alert('Selecciona un grupo');
 
   const confirmar = confirm(`¿Seguro que quieres eliminar el grupo "${currentGroupName}"?`);
   if (!confirmar) return;
@@ -215,13 +255,8 @@
   localStorage.removeItem('grupo_id');
   localStorage.removeItem('grupo_nombre');
 
-  document.getElementById('nombre-grupo').innerText = currentGroupName;
-  document.getElementById('lista-integrantes').innerHTML = '';
-  document.getElementById('gasto-pago').innerHTML = '<option value="">¿Quién pagó?</option>';
-  document.getElementById('resultado-pagos').innerHTML = '';
-  document.getElementById('total-gastado').innerText = '0,00 €';
-  document.getElementById('total-movimientos').innerText = '0';
-  document.getElementById('por-persona').innerText = '0,00 €';
+  await loadGroups();
+  loadData();
 
   alert('Grupo eliminado');
 }
@@ -395,7 +430,8 @@
   `).join('');
 }
   
-  loadData();
+  loadGroups();
+loadData();
 </script>
 </body>
 </html>
