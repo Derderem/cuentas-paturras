@@ -26,11 +26,25 @@
       <option value="">Sin grupo</option>
     </select>
   </div>
+    <div class="text-[10px] font-semibold">
+    Código: <span id="codigo-grupo">---</span>
+  </div>
+</div>
 
   <div class="flex gap-2">
     <button onclick="createGroup()" class="btn-primary px-4 py-2 rounded-full text-sm">+ Nuevo</button>
     <button onclick="deleteGroup()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full text-sm font-bold">
       Eliminar
+    </button>
+  </div>
+</div>
+
+  <div class="card p-4 md:p-6 mb-6">
+  <h2 class="text-lg font-bold mb-3">Unirse a un grupo</h2>
+  <div class="flex gap-2">
+    <input id="codigo-invitacion" type="text" placeholder="Introduce código" class="input-field text-sm uppercase">
+    <button onclick="joinGroupByCode()" class="btn-primary px-4 py-2 rounded-lg text-sm">
+      Unirse
     </button>
   </div>
 </div>
@@ -174,7 +188,10 @@
   }
 
   async function loadGroups() {
-  const { data: groups, error } = await db.from('grupos').select('*').order('created_at', { ascending: true });
+  const { data: groups, error } = await db
+    .from('grupos')
+    .select('*')
+    .order('created_at', { ascending: true });
 
   if (error) {
     alert('Error cargando grupos: ' + error.message);
@@ -185,11 +202,15 @@
   selector.innerHTML = '<option value="">Sin grupo</option>';
 
   groups.forEach(group => {
-    selector.innerHTML += `<option value="${group.id}">${group.nombre}</option>`;
+    selector.innerHTML += `<option value="${group.id}" data-codigo="${group.codigo || ''}">${group.nombre}</option>`;
   });
 
   if (currentGroupId) {
     selector.value = currentGroupId;
+    const selectedOption = selector.options[selector.selectedIndex];
+    document.getElementById('codigo-grupo').innerText = selectedOption?.dataset?.codigo || '---';
+  } else {
+    document.getElementById('codigo-grupo').innerText = '---';
   }
 }
 
@@ -203,21 +224,32 @@
   if (currentGroupId) {
     localStorage.setItem('grupo_id', currentGroupId);
     localStorage.setItem('grupo_nombre', currentGroupName);
+    document.getElementById('codigo-grupo').innerText = selectedOption.dataset.codigo || '---';
   } else {
     localStorage.removeItem('grupo_id');
     localStorage.removeItem('grupo_nombre');
+    document.getElementById('codigo-grupo').innerText = '---';
   }
 
   loadData();
 }
   
-  async function createGroup() {
+  function generarCodigo() {
+  return Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
+async function createGroup() {
   const nombre = prompt('Nombre del grupo:');
   if (!nombre || !nombre.trim()) return;
 
+  const codigo = generarCodigo();
+
   const { data, error } = await db
     .from('grupos')
-    .insert({ nombre: nombre.trim() })
+    .insert({
+      nombre: nombre.trim(),
+      codigo: codigo
+    })
     .select()
     .single();
 
@@ -234,6 +266,8 @@
 
   await loadGroups();
   loadData();
+
+  alert(`Grupo creado.\nCódigo de acceso: ${data.codigo}`);
 }
 
   async function deleteGroup() {
@@ -332,6 +366,34 @@
   document.getElementById('gasto-ticket').value = '';
 
   loadData();
+}
+
+  async function joinGroupByCode() {
+  const codigo = document.getElementById('codigo-invitacion').value.trim().toUpperCase();
+  if (!codigo) return alert('Introduce un código');
+
+  const { data, error } = await db
+    .from('grupos')
+    .select('*')
+    .eq('codigo', codigo)
+    .single();
+
+  if (error || !data) {
+    alert('Código no válido');
+    return;
+  }
+
+  currentGroupId = data.id;
+  currentGroupName = data.nombre;
+
+  localStorage.setItem('grupo_id', currentGroupId);
+  localStorage.setItem('grupo_nombre', currentGroupName);
+
+  await loadGroups();
+  loadData();
+
+  document.getElementById('codigo-invitacion').value = '';
+  alert(`Te has unido al grupo "${data.nombre}"`);
 }
 
  async function resolverPagos() {
