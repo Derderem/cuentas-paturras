@@ -72,6 +72,14 @@
     <div class="bg-white text-black p-4 md:p-6 rounded-3xl">
     <h2 class="text-lg md:text-2xl font-bold mb-4">Añadir gasto</h2>
 
+      <div class="card p-4 md:p-6">
+  <h2 class="text-lg md:text-xl font-bold mb-4">Quién paga a quién</h2>
+  <button onclick="resolverPagos()" class="btn-primary w-full py-3 rounded-xl text-sm md:text-base mb-4">
+    Resolver pagos
+  </button>
+  <div id="resultado-pagos" class="space-y-2 text-sm"></div>
+</div>
+
     <div class="space-y-3">
         <div>
             <label class="text-[10px] md:text-xs font-bold text-gray-500 uppercase">Compra</label>
@@ -208,33 +216,153 @@
   }
 
   async function addExpense() {
-    if (!currentGroupId) return alert('Primero crea un grupo');
+  if (!currentGroupId) return alert('Primero crea un grupo');
 
-    const descripcion = document.getElementById('gasto-descripcion').value.trim();
-    const importe = document.getElementById('gasto-importe').value;
-    const pagado_por = document.getElementById('gasto-pago').value;
+  const descripcion = document.getElementById('gasto-descripcion').value.trim();
+  const importe = document.getElementById('gasto-importe').value;
+  const pagado_por = document.getElementById('gasto-pago').value;
+  const ticketFile = document.getElementById('gasto-ticket').files[0];
 
-    if (!descripcion || !importe || !pagado_por) return alert('Rellena todo');
+  if (!descripcion || !importe || !pagado_por) return alert('Rellena todo');
 
-    const { error } = await db.from('gastos').insert({
-      descripcion,
-      importe: parseFloat(importe),
-      pagado_por,
-      grupo_id: currentGroupId
-    });
+  let ticket_url = null;
 
-    if (error) {
-      alert('Error: ' + error.message);
+  if (ticketFile) {
+    const fileName = `${Date.now()}-${ticketFile.name}`;
+
+    const { error: uploadError } = await db.storage
+      .from('tickets')
+      .upload(fileName, ticketFile);
+
+    if (uploadError) {
+      alert('Error subiendo ticket: ' + uploadError.message);
       return;
     }
 
-    document.getElementById('gasto-descripcion').value = '';
-    document.getElementById('gasto-importe').value = '';
-    document.getElementById('gasto-pago').value = '';
+    const { data: publicUrlData } = db.storage
+      .from('tickets')
+      .getPublicUrl(fileName);
 
-    loadData();
+    ticket_url = publicUrlData.publicUrl;
   }
 
+  const { error } = await db.from('gastos').insert({
+    descripcion,
+    importe: parseFloat(importe),
+    pagado_por,
+    grupo_id: currentGroupId,
+    ticket_url
+  });
+
+  if (error) {
+    alert('Error: ' + error.message);
+    return;
+  }
+
+  document.getElementById('gasto-descripcion').value = '';
+  document.getElementById('gasto-importe').value = '';
+  document.getElementById('gasto-pago').value = '';
+  document.getElementById('gasto-ticket').value = '';
+
+  loadData();
+}
+
+  async function resolverPagos() {
+  if (!currentGroupId) return alert('Primero crea un grupo');
+
+  const { data: members, error: membersError } = await db
+    .from('integrantes')
+    .select('*')
+    .eq('grupo_id', currentGroupId);
+
+  if (membersError) {
+    alert('Error integrantes: ' + membersError.message);
+    return;
+  }
+
+  const { data: expenses, error: expensesError } = await db
+    .from('gastos')
+    .select('*')
+    .eq('grupo_id', currentGroupId);
+
+  if (expensesError) {
+    alert('Error gastos: ' + expensesError.message);
+    return;
+  }
+
+  if (!members.length || !expenses.length) {
+    document.getElementById('resultado-pagos').innerHTML =
+      '<div class="bg-yellow-100 text-yellow-800 p-3 rounded-lg">No hay datos suficientes.</div>';
+    return;
+  }
+
+  const total = expenses.reduce((sum, e) => sum + parseFloat(e.importe || 0), 0);
+  const porPersona = total / members.length;
+
+  const balance = {};
+
+  members.forEach(m => {
+    balance[m.id] = {
+      nombre: m.nombre,
+      pagado: 0,
+      debe: porPersona,
+      balance: 0
+    };
+  });
+
+  expenses.forEach(e => {
+    if (balance[e.pagado_por]) {
+      balance[e.pagado_por].pagado += parseFloat(e.importe || 0);
+    }
+  });
+
+  Object.keys(balance).forEach(id => {
+    balance[id].balance = balance[id].pagado - balance[id].debe;
+  });
+
+  const acreedores = [];
+  const deudores = [];
+
+  Object.values(balance).forEach(p => {
+    if (p.balance > 0.01) acreedores.push({ nombre: p.nombre, cantidad: p.balance });
+    if (p.balance < -0.01) deudores.push({ nombre: p.nombre, cantidad: Math.abs(p.balance) });
+  });
+
+  const pagos = [];
+  let i = 0;
+  let j = 0;
+
+  while (i < deudores.length && j < acreedores.length) {
+    const cantidad = Math.min(deudores[i].cantidad, acreedores[j].cantidad);
+
+    pagos.push({
+      deudor: deudores[i].nombre,
+      acreedor: acreedores[j].nombre,
+      cantidad: cantidad
+    });
+
+    deudores[i].cantidad -= cantidad;
+    acreedores[j].cantidad -= cantidad;
+
+    if (deudores[i].cantidad < 0.01) i++;
+    if (acreedores[j].cantidad < 0.01) j++;
+  }
+
+  const resultado = document.getElementById('resultado-pagos');
+
+  if (!pagos.length) {
+    resultado.innerHTML = '<div class="bg-green-100 text-green-800 p-3 rounded-lg">Todo está equilibrado.</div>';
+    return;
+  }
+
+  resultado.innerHTML = pagos.map(p => `
+    <div class="bg-[#1a262b] text-white p-3 rounded-lg flex justify-between items-center">
+      <span>${p.deudor} paga a ${p.acreedor}</span>
+      <span class="font-bold text-yellow-400">${p.cantidad.toFixed(2)} €</span>
+    </div>
+  `).join('');
+}
+  
   loadData();
 </script>
 </body>
