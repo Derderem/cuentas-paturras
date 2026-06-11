@@ -114,51 +114,125 @@
 
   async function loadData() {
     document.getElementById('nombre-grupo').innerText = currentGroupName;
-    if (!currentGroupId) return;
 
-    const { data: members } = await db.from('integrantes').select('*').eq('grupo_id', currentGroupId);
+    if (!currentGroupId) {
+      document.getElementById('lista-integrantes').innerHTML = '';
+      document.getElementById('gasto-pago').innerHTML = '<option value="">¿Quién pagó?</option>';
+      document.getElementById('total-gastado').innerText = '0,00 €';
+      document.getElementById('total-movimientos').innerText = '0';
+      document.getElementById('por-persona').innerText = '0,00 €';
+      return;
+    }
+
+    const { data: members, error: membersError } = await db
+      .from('integrantes')
+      .select('*')
+      .eq('grupo_id', currentGroupId);
+
+    if (membersError) {
+      alert('Error integrantes: ' + membersError.message);
+      return;
+    }
+
     const lista = document.getElementById('lista-integrantes');
     const select = document.getElementById('gasto-pago');
-    lista.innerHTML = ''; select.innerHTML = '<option value="">¿Quién pagó?</option>';
-    
-    members.forEach(m => {
-      lista.innerHTML += `<div class="bg-[#1a262b] p-3 rounded-lg">${m.nombre}</div>`;
+
+    lista.innerHTML = '';
+    select.innerHTML = '<option value="">¿Quién pagó?</option>';
+
+    (members || []).forEach(m => {
+      lista.innerHTML += `<div class="bg-[#1a262b] p-3 rounded-lg text-sm md:text-base">${m.nombre}</div>`;
       select.innerHTML += `<option value="${m.id}">${m.nombre}</option>`;
     });
 
-    const { data: expenses } = await db.from('gastos').select('*').eq('grupo_id', currentGroupId);
-    const total = expenses.reduce((a, c) => a + parseFloat(c.importe), 0);
+    const { data: expenses, error: expensesError } = await db
+      .from('gastos')
+      .select('*')
+      .eq('grupo_id', currentGroupId);
+
+    if (expensesError) {
+      alert('Error gastos: ' + expensesError.message);
+      return;
+    }
+
+    const safeExpenses = expenses || [];
+    const total = safeExpenses.reduce((a, c) => a + parseFloat(c.importe || 0), 0);
+
     document.getElementById('total-gastado').innerText = total.toFixed(2) + ' €';
-    document.getElementById('total-movimientos').innerText = expenses.length;
-    document.getElementById('por-persona').innerText = (members.length ? total / members.length : 0).toFixed(2) + ' €';
+    document.getElementById('total-movimientos').innerText = safeExpenses.length;
+    document.getElementById('por-persona').innerText = ((members && members.length) ? total / members.length : 0).toFixed(2) + ' €';
   }
 
   async function createGroup() {
     const nombre = prompt('Nombre del grupo:');
-    if (!nombre) return;
-    const { data, error } = await db.from('grupos').insert({ nombre }).select().single();
-    if (error) { alert('Error: ' + error.message); return; }
-    currentGroupId = data.id; currentGroupName = data.nombre;
+    if (!nombre || !nombre.trim()) return;
+
+    const { data, error } = await db
+      .from('grupos')
+      .insert({ nombre: nombre.trim() })
+      .select()
+      .single();
+
+    if (error) {
+      alert('Error: ' + error.message);
+      return;
+    }
+
+    currentGroupId = data.id;
+    currentGroupName = data.nombre;
+
     localStorage.setItem('grupo_id', currentGroupId);
     localStorage.setItem('grupo_nombre', currentGroupName);
+
     loadData();
   }
 
   async function addMember() {
     if (!currentGroupId) return alert('Primero pulsa + Nuevo');
-    const nombre = document.getElementById('nuevo-integrante').value;
+
+    const input = document.getElementById('nuevo-integrante');
+    const nombre = input.value.trim();
     if (!nombre) return;
-    await db.from('integrantes').insert({ nombre, grupo_id: currentGroupId });
-    document.getElementById('nuevo-integrante').value = '';
+
+    const { error } = await db.from('integrantes').insert({
+      nombre,
+      grupo_id: currentGroupId
+    });
+
+    if (error) {
+      alert('Error: ' + error.message);
+      return;
+    }
+
+    input.value = '';
     loadData();
   }
 
   async function addExpense() {
-    const descripcion = document.getElementById('gasto-descripcion').value;
+    if (!currentGroupId) return alert('Primero crea un grupo');
+
+    const descripcion = document.getElementById('gasto-descripcion').value.trim();
     const importe = document.getElementById('gasto-importe').value;
     const pagado_por = document.getElementById('gasto-pago').value;
+
     if (!descripcion || !importe || !pagado_por) return alert('Rellena todo');
-    await db.from('gastos').insert({ descripcion, importe: parseFloat(importe), pagado_por, grupo_id: currentGroupId });
+
+    const { error } = await db.from('gastos').insert({
+      descripcion,
+      importe: parseFloat(importe),
+      pagado_por,
+      grupo_id: currentGroupId
+    });
+
+    if (error) {
+      alert('Error: ' + error.message);
+      return;
+    }
+
+    document.getElementById('gasto-descripcion').value = '';
+    document.getElementById('gasto-importe').value = '';
+    document.getElementById('gasto-pago').value = '';
+
     loadData();
   }
 
