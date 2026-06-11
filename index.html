@@ -19,16 +19,18 @@
 <body class="p-4 md:p-8">
 
   <!-- Header -->
-  <div class="flex justify-between items-center mb-8">
-    <div class="flex items-center gap-2 bg-yellow-400 text-black px-3 py-1 rounded-full font-bold text-sm">
-      📁 <span id="nombre-grupo">Sin grupo</span>
-    </div>
-    <button onclick="createGroup()" class="btn-primary px-4 py-2 rounded-full text-sm">+ Nuevo</button>
+  <div class="flex justify-between items-center mb-8 gap-2">
+  <div class="flex items-center gap-2 bg-yellow-400 text-black px-3 py-1 rounded-full font-bold text-sm">
+    📁 <span id="nombre-grupo">Sin grupo</span>
   </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <div class="lg:col-span-2 space-y-6">
-      <div class="card p-4 md:p-8 flex flex-col gap-6">
+  <div class="flex gap-2">
+    <button onclick="createGroup()" class="btn-primary px-4 py-2 rounded-full text-sm">+ Nuevo</button>
+    <button onclick="deleteGroup()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full text-sm font-bold">
+      Eliminar
+    </button>
+  </div>
+</div>
         <!-- HERO -->
         <div class="flex flex-row items-start justify-between gap-3">
   <div class="flex-1 min-w-0">
@@ -58,27 +60,27 @@
       </div>
 
       <!-- INTEGRANTES -->
-      <div class="card p-4 md:p-6">
-    <h2 class="text-lg md:text-xl font-bold mb-4">👥 Integrantes</h2>
-        <div class="flex gap-2 mb-4">
-          <input id="nuevo-integrante" type="text" placeholder="Nuevo integrante" class="input-field">
-          <button onclick="addMember()" class="bg-yellow-400 text-black px-4 py-2 rounded-lg font-bold text-sm">+</button>
-        </div>
-        <div id="lista-integrantes" class="space-y-2"></div>
-      </div>
-    </div>
+<div class="card p-4 md:p-6">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-lg md:text-xl font-bold">👥 Integrantes</h2>
+    <button onclick="resolverPagos()" class="btn-primary px-3 py-2 rounded-lg text-xs md:text-sm">
+      Resolver pagos
+    </button>
+  </div>
+
+  <div class="flex gap-2 mb-4">
+    <input id="nuevo-integrante" type="text" placeholder="Nuevo integrante" class="input-field text-sm">
+    <button onclick="addMember()" class="bg-yellow-400 text-black px-4 py-2 rounded-lg font-bold text-sm">+</button>
+  </div>
+
+  <div id="lista-integrantes" class="space-y-2"></div>
+
+  <div id="resultado-pagos" class="space-y-2 mt-4 text-sm"></div>
+</div>
 
     <!-- DERECHA -->
     <div class="bg-white text-black p-4 md:p-6 rounded-3xl">
     <h2 class="text-lg md:text-2xl font-bold mb-4">Añadir gasto</h2>
-
-      <div class="card p-4 md:p-6">
-  <h2 class="text-lg md:text-xl font-bold mb-4">Quién paga a quién</h2>
-  <button onclick="resolverPagos()" class="btn-primary w-full py-3 rounded-xl text-sm md:text-base mb-4">
-    Resolver pagos
-  </button>
-  <div id="resultado-pagos" class="space-y-2 text-sm"></div>
-</div>
 
     <div class="space-y-3">
         <div>
@@ -194,6 +196,36 @@
     loadData();
   }
 
+  async function deleteGroup() {
+  if (!currentGroupId) return alert('No hay grupo para eliminar');
+
+  const confirmar = confirm(`¿Seguro que quieres eliminar el grupo "${currentGroupName}"?`);
+  if (!confirmar) return;
+
+  const { error } = await db.from('grupos').delete().eq('id', currentGroupId);
+
+  if (error) {
+    alert('Error al eliminar grupo: ' + error.message);
+    return;
+  }
+
+  currentGroupId = null;
+  currentGroupName = 'Sin grupo';
+
+  localStorage.removeItem('grupo_id');
+  localStorage.removeItem('grupo_nombre');
+
+  document.getElementById('nombre-grupo').innerText = currentGroupName;
+  document.getElementById('lista-integrantes').innerHTML = '';
+  document.getElementById('gasto-pago').innerHTML = '<option value="">¿Quién pagó?</option>';
+  document.getElementById('resultado-pagos').innerHTML = '';
+  document.getElementById('total-gastado').innerText = '0,00 €';
+  document.getElementById('total-movimientos').innerText = '0';
+  document.getElementById('por-persona').innerText = '0,00 €';
+
+  alert('Grupo eliminado');
+}
+
   async function addMember() {
     if (!currentGroupId) return alert('Primero pulsa + Nuevo');
 
@@ -267,7 +299,7 @@
   loadData();
 }
 
-  async function resolverPagos() {
+ async function resolverPagos() {
   if (!currentGroupId) return alert('Primero crea un grupo');
 
   const { data: members, error: membersError } = await db
