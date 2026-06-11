@@ -11,7 +11,7 @@
     body { font-family: 'Inter', sans-serif; background-color: #1a262b; color: white; }
     .card { background-color: #24343a; border-radius: 1rem; }
     .input-field { background-color: white; color: black; border-radius: 0.5rem; padding: 0.5rem; width: 100%; }
-    .btn-primary { background-color: #0d6d5c; color: white; font-weight: bold; transition: 0.3s; }
+    .btn-primary { background-color: #0d6e5c; color: white; font-weight: bold; transition: 0.3s; }
     .btn-primary:hover { background-color: #148c7a; }
     .accent-yellow { color: #facc15; }
   </style>
@@ -20,480 +20,478 @@
 
   <!-- Header -->
   <div class="flex justify-between items-center mb-8 gap-2 flex-wrap">
-  <div class="flex items-center gap-2 bg-yellow-400 text-black px-3 py-2 rounded-full font-bold text-sm">
-    📁
-    <select id="selector-grupo" onchange="changeGroup()" class="bg-yellow-400 text-black font-bold outline-none">
-      <option value="">Sin grupo</option>
-    </select>
-  </div>
-    <div class="text-[10px] font-semibold">
-    Código: <span id="codigo-grupo">---</span>
-  </div>
-</div>
+    <div class="flex items-center gap-2 bg-yellow-400 text-black px-3 py-2 rounded-full font-bold text-sm">
+      📁
+      <select id="selector-grupo" onchange="changeGroup()" class="bg-yellow-400 text-black font-bold outline-none">
+        <option value="">Sin grupo</option>
+      </select>
+    </div>
 
-  <div class="flex gap-2">
-    <button onclick="createGroup()" class="btn-primary px-4 py-2 rounded-full text-sm">+ Nuevo</button>
-    <button onclick="deleteGroup()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full text-sm font-bold">
-      Eliminar
-    </button>
+    <div class="flex gap-2">
+      <button onclick="createGroup()" class="btn-primary px-4 py-2 rounded-full text-sm">+ Nuevo</button>
+      <button onclick="deleteGroup()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full text-sm font-bold">
+        Eliminar
+      </button>
+    </div>
   </div>
-</div>
 
+  <!-- Unirse por código -->
   <div class="card p-4 md:p-6 mb-6">
-  <h2 class="text-lg font-bold mb-3">Unirse a un grupo</h2>
-  <div class="flex gap-2">
-    <input id="codigo-invitacion" type="text" placeholder="Introduce código" class="input-field text-sm uppercase">
-    <button onclick="joinGroupByCode()" class="btn-primary px-4 py-2 rounded-lg text-sm">
-      Unirse
-    </button>
+    <h2 class="text-lg font-bold mb-3">Unirse a un grupo</h2>
+    <div class="flex gap-2">
+      <input id="codigo-invitacion" type="text" placeholder="Introduce código" class="input-field text-sm uppercase">
+      <button onclick="joinGroupByCode()" class="btn-primary px-4 py-2 rounded-lg text-sm">
+        Unirse
+      </button>
+    </div>
   </div>
-</div>
-        <!-- HERO -->
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-6">
+
+      <!-- HERO -->
+      <div class="card p-4 md:p-8 flex flex-col gap-6">
         <div class="flex flex-row items-start justify-between gap-3">
-  <div class="flex-1 min-w-0">
-    <h1 class="text-3xl md:text-6xl font-extrabold leading-none">Cuenta Clara</h1>
-    <h2 class="text-2xl md:text-5xl font-extrabold mb-2 accent-yellow leading-none">para grupos</h2>
-    <p class="text-white font-bold text-sm md:text-xl leading-tight opacity-90 max-w-[220px] md:max-w-[280px]">
-      Crea un grupo, apunta cada compra con su ticket y descubre al instante quien paga a quien.
-    </p>
-  </div>
-  <img src="logo-pato.png" class="w-24 md:w-72 h-auto object-contain drop-shadow-2xl" alt="pato">
-</div>
+          <div class="flex-1 min-w-0">
+            <h1 class="text-3xl md:text-6xl font-extrabold leading-none">Cuenta Clara</h1>
+            <h2 class="text-2xl md:text-5xl font-extrabold mb-2 accent-yellow leading-none">para grupos</h2>
+            <p class="text-white font-bold text-sm md:text-xl leading-tight opacity-90 max-w-[220px] md:max-w-[280px]">
+              Crea un grupo, apunta cada compra con su ticket y descubre al instante quien paga a quien.
+            </p>
+          </div>
+          <img src="logo-pato.png" class="w-24 md:w-72 h-auto object-contain drop-shadow-2xl" alt="pato">
+        </div>
+
         <!-- TOTALES -->
         <div class="grid grid-cols-3 gap-2">
-    <div class="bg-[#1a262b] p-2 md:p-4 rounded-2xl border border-gray-700">
-        <p class="text-gray-300 text-[10px] md:text-sm leading-tight">Total gastado</p>
-        <p id="total-gastado" class="text-lg md:text-3xl font-black leading-none">0,00 €</p>
-    </div>
-    <div class="bg-[#1a262b] p-2 md:p-4 rounded-2xl border border-gray-700">
-        <p class="text-gray-300 text-[10px] md:text-sm leading-tight">Por persona</p>
-        <p id="por-persona" class="text-lg md:text-3xl font-black leading-none">0,00 €</p>
-    </div>
-    <div class="bg-[#1a262b] p-2 md:p-4 rounded-2xl border border-gray-700">
-        <p class="text-gray-300 text-[10px] md:text-sm leading-tight">Movimientos</p>
-        <p id="total-movimientos" class="text-lg md:text-3xl font-black leading-none">0</p>
-    </div>
-</div>
+          <div class="bg-[#1a262b] p-2 md:p-4 rounded-2xl border border-gray-700">
+            <p class="text-gray-300 text-[10px] md:text-sm leading-tight">Total gastado</p>
+            <p id="total-gastado" class="text-lg md:text-3xl font-black leading-none">0,00 €</p>
+          </div>
+          <div class="bg-[#1a262b] p-2 md:p-4 rounded-2xl border border-gray-700">
+            <p class="text-gray-300 text-[10px] md:text-sm leading-tight">Por persona</p>
+            <p id="por-persona" class="text-lg md:text-3xl font-black leading-none">0,00 €</p>
+          </div>
+          <div class="bg-[#1a262b] p-2 md:p-4 rounded-2xl border border-gray-700">
+            <p class="text-gray-300 text-[10px] md:text-sm leading-tight">Movimientos</p>
+            <p id="total-movimientos" class="text-lg md:text-3xl font-black leading-none">0</p>
+          </div>
+        </div>
       </div>
 
       <!-- INTEGRANTES -->
-<div class="card p-4 md:p-6">
-  <div class="flex justify-between items-center mb-4">
-    <h2 class="text-lg md:text-xl font-bold">👥 Integrantes</h2>
-    <button onclick="resolverPagos()" class="btn-primary px-3 py-2 rounded-lg text-xs md:text-sm">
-      Resolver pagos
-    </button>
-  </div>
+      <div class="card p-4 md:p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg md:text-xl font-bold">👥 Integrantes</h2>
+          <button onclick="resolverPagos()" class="btn-primary px-3 py-2 rounded-lg text-xs md:text-sm">
+            Resolver pagos
+          </button>
+        </div>
 
-  <div class="flex gap-2 mb-4">
-    <input id="nuevo-integrante" type="text" placeholder="Nuevo integrante" class="input-field text-sm">
-    <button onclick="addMember()" class="bg-yellow-400 text-black px-4 py-2 rounded-lg font-bold text-sm">+</button>
-  </div>
+        <div class="flex gap-2 mb-4">
+          <input id="nuevo-integrante" type="text" placeholder="Nuevo integrante" class="input-field text-sm">
+          <button onclick="addMember()" class="bg-yellow-400 text-black px-4 py-2 rounded-lg font-bold text-sm">+</button>
+        </div>
 
-  <div id="lista-integrantes" class="space-y-2"></div>
-
-  <div id="resultado-pagos" class="space-y-2 mt-4 text-sm"></div>
-</div>
+        <div id="lista-integrantes" class="space-y-2"></div>
+        <div id="resultado-pagos" class="space-y-2 mt-4 text-sm"></div>
+      </div>
+    </div>
 
     <!-- DERECHA -->
-    <div class="bg-white text-black p-4 md:p-6 rounded-3xl">
-    <h2 class="text-lg md:text-2xl font-bold mb-4">Añadir gasto</h2>
+    <div class="space-y-6">
+      <div class="bg-white text-black p-4 md:p-6 rounded-3xl">
+        <h2 class="text-lg md:text-2xl font-bold mb-4">Añadir gasto</h2>
 
-    <div class="space-y-3">
-        <div>
+        <div class="space-y-3">
+          <div>
             <label class="text-[10px] md:text-xs font-bold text-gray-500 uppercase">Compra</label>
             <input id="gasto-descripcion" type="text" placeholder="Cena, súper..." class="input-field border text-sm">
-        </div>
+          </div>
 
-        <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-2 gap-3">
             <div>
-                <label class="text-[10px] md:text-xs font-bold text-gray-500 uppercase">Importe</label>
-                <input id="gasto-importe" type="number" placeholder="42.50" class="input-field border text-sm">
+              <label class="text-[10px] md:text-xs font-bold text-gray-500 uppercase">Importe</label>
+              <input id="gasto-importe" type="number" placeholder="42.50" class="input-field border text-sm">
             </div>
             <div>
-                <label class="text-[10px] md:text-xs font-bold text-gray-500 uppercase">Pagó</label>
-                <select id="gasto-pago" class="input-field border text-sm"></select>
+              <label class="text-[10px] md:text-xs font-bold text-gray-500 uppercase">Pagó</label>
+              <select id="gasto-pago" class="input-field border text-sm"></select>
             </div>
-        </div>
+          </div>
 
-        <div>
-  <label class="text-[10px] md:text-xs font-bold text-gray-500 uppercase">Ticket (foto o PDF)</label>
-  <input id="gasto-ticket" type="file" accept=".jpg,.jpeg,.png,.pdf" class="input-field border text-sm bg-white">
-</div>
-        </div>
+          <div>
+            <label class="text-[10px] md:text-xs font-bold text-gray-500 uppercase">Ticket (foto o PDF)</label>
+            <input id="gasto-ticket" type="file" accept=".jpg,.jpeg,.png,.pdf" class="input-field border text-sm bg-white">
+          </div>
 
-        <button onclick="addExpense()" class="btn-primary w-full py-2.5 md:py-3 rounded-xl text-sm md:text-base">
+          <button onclick="addExpense()" class="btn-primary w-full py-2.5 md:py-3 rounded-xl text-sm md:text-base">
             + Guardar gasto
-        </button>
-    </div>
-</div>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
-<script>
-  const SUPABASE_URL = 'https://tnlsxnuavtofejejoydq.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRubHN4bnVhdnRvZmVqZWpveWRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMTY3MjMsImV4cCI6MjA5NjU5MjcyM30.U0Fd-4sgMpAU7yBcgvOwiqsg_cC1JZ4LmE4KST5hMbw';
-  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  <script>
+    const SUPABASE_URL = 'https://tnlsxnuavtofejejoydq.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRubHN4bnVhdnRvZmVqZWpveWRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMTY3MjMsImV4cCI6MjA5NjU5MjcyM30.U0Fd-4sgMpAU7yBcgvOwiqsg_cC1JZ4LmE4KST5hMbw';
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  let currentGroupId = localStorage.getItem('grupo_id');
-  let currentGroupName = localStorage.getItem('grupo_nombre') || 'Sin grupo';
+    let currentGroupId = localStorage.getItem('grupo_id');
+    let currentGroupName = localStorage.getItem('grupo_nombre') || 'Sin grupo';
 
-  async function loadData() {
-    if (!currentGroupId) {
-      document.getElementById('lista-integrantes').innerHTML = '';
-      document.getElementById('gasto-pago').innerHTML = '<option value="">¿Quién pagó?</option>';
-      document.getElementById('total-gastado').innerText = '0,00 €';
-      document.getElementById('total-movimientos').innerText = '0';
-      document.getElementById('por-persona').innerText = '0,00 €';
-      return;
+    function generarCodigo() {
+      return Math.random().toString(36).substring(2, 8).toUpperCase();
     }
 
-    const { data: members, error: membersError } = await db
-      .from('integrantes')
-      .select('*')
-      .eq('grupo_id', currentGroupId);
+    async function loadGroups() {
+      const { data: groups, error } = await db
+        .from('grupos')
+        .select('*')
+        .order('created_at', { ascending: true });
 
-    if (membersError) {
-      alert('Error integrantes: ' + membersError.message);
-      return;
+      if (error) {
+        alert('Error cargando grupos: ' + error.message);
+        return;
+      }
+
+      const selector = document.getElementById('selector-grupo');
+      selector.innerHTML = '<option value="">Sin grupo</option>';
+
+      (groups || []).forEach(group => {
+        selector.innerHTML += `<option value="${group.id}">${group.nombre}</option>`;
+      });
+
+      if (currentGroupId) {
+        selector.value = currentGroupId;
+      }
     }
 
-    const lista = document.getElementById('lista-integrantes');
-    const select = document.getElementById('gasto-pago');
+    function changeGroup() {
+      const selector = document.getElementById('selector-grupo');
+      const selectedOption = selector.options[selector.selectedIndex];
 
-    lista.innerHTML = '';
-    select.innerHTML = '<option value="">¿Quién pagó?</option>';
+      currentGroupId = selector.value || null;
+      currentGroupName = selector.value ? selectedOption.text : 'Sin grupo';
 
-    (members || []).forEach(m => {
-      lista.innerHTML += `<div class="bg-[#1a262b] p-3 rounded-lg text-sm md:text-base">${m.nombre}</div>`;
-      select.innerHTML += `<option value="${m.id}">${m.nombre}</option>`;
-    });
+      if (currentGroupId) {
+        localStorage.setItem('grupo_id', currentGroupId);
+        localStorage.setItem('grupo_nombre', currentGroupName);
+      } else {
+        localStorage.removeItem('grupo_id');
+        localStorage.removeItem('grupo_nombre');
+      }
 
-    const { data: expenses, error: expensesError } = await db
-      .from('gastos')
-      .select('*')
-      .eq('grupo_id', currentGroupId);
-
-    if (expensesError) {
-      alert('Error gastos: ' + expensesError.message);
-      return;
+      loadData();
     }
 
-    const safeExpenses = expenses || [];
-    const total = safeExpenses.reduce((a, c) => a + parseFloat(c.importe || 0), 0);
+    async function loadData() {
+      if (!currentGroupId) {
+        document.getElementById('lista-integrantes').innerHTML = '';
+        document.getElementById('gasto-pago').innerHTML = '<option value="">¿Quién pagó?</option>';
+        document.getElementById('resultado-pagos').innerHTML = '';
+        document.getElementById('total-gastado').innerText = '0,00 €';
+        document.getElementById('total-movimientos').innerText = '0';
+        document.getElementById('por-persona').innerText = '0,00 €';
+        return;
+      }
 
-    document.getElementById('total-gastado').innerText = total.toFixed(2) + ' €';
-    document.getElementById('total-movimientos').innerText = safeExpenses.length;
-    document.getElementById('por-persona').innerText = ((members && members.length) ? total / members.length : 0).toFixed(2) + ' €';
-  }
+      const { data: members, error: membersError } = await db
+        .from('integrantes')
+        .select('*')
+        .eq('grupo_id', currentGroupId);
 
-  async function loadGroups() {
-  const { data: groups, error } = await db
-    .from('grupos')
-    .select('*')
-    .order('created_at', { ascending: true });
+      if (membersError) {
+        alert('Error integrantes: ' + membersError.message);
+        return;
+      }
 
-  if (error) {
-    alert('Error cargando grupos: ' + error.message);
-    return;
-  }
+      const lista = document.getElementById('lista-integrantes');
+      const select = document.getElementById('gasto-pago');
 
-  const selector = document.getElementById('selector-grupo');
-  selector.innerHTML = '<option value="">Sin grupo</option>';
+      lista.innerHTML = '';
+      select.innerHTML = '<option value="">¿Quién pagó?</option>';
 
-  groups.forEach(group => {
-    selector.innerHTML += `<option value="${group.id}" data-codigo="${group.codigo || ''}">${group.nombre}</option>`;
-  });
+      (members || []).forEach(m => {
+        lista.innerHTML += `<div class="bg-[#1a262b] p-3 rounded-lg text-sm md:text-base">${m.nombre}</div>`;
+        select.innerHTML += `<option value="${m.id}">${m.nombre}</option>`;
+      });
 
-  if (currentGroupId) {
-    selector.value = currentGroupId;
-    const selectedOption = selector.options[selector.selectedIndex];
-    document.getElementById('codigo-grupo').innerText = selectedOption?.dataset?.codigo || '---';
-  } else {
-    document.getElementById('codigo-grupo').innerText = '---';
-  }
-}
+      const { data: expenses, error: expensesError } = await db
+        .from('gastos')
+        .select('*')
+        .eq('grupo_id', currentGroupId);
 
-  function changeGroup() {
-  const selector = document.getElementById('selector-grupo');
-  const selectedOption = selector.options[selector.selectedIndex];
+      if (expensesError) {
+        alert('Error gastos: ' + expensesError.message);
+        return;
+      }
 
-  currentGroupId = selector.value || null;
-  currentGroupName = selector.value ? selectedOption.text : 'Sin grupo';
+      const safeExpenses = expenses || [];
+      const total = safeExpenses.reduce((a, c) => a + parseFloat(c.importe || 0), 0);
 
-  if (currentGroupId) {
-    localStorage.setItem('grupo_id', currentGroupId);
-    localStorage.setItem('grupo_nombre', currentGroupName);
-    document.getElementById('codigo-grupo').innerText = selectedOption.dataset.codigo || '---';
-  } else {
-    localStorage.removeItem('grupo_id');
-    localStorage.removeItem('grupo_nombre');
-    document.getElementById('codigo-grupo').innerText = '---';
-  }
-
-  loadData();
-}
-  
-  function generarCodigo() {
-  return Math.random().toString(36).substring(2, 8).toUpperCase();
-}
-
-async function createGroup() {
-  const nombre = prompt('Nombre del grupo:');
-  if (!nombre || !nombre.trim()) return;
-
-  const codigo = generarCodigo();
-
-  const { data, error } = await db
-    .from('grupos')
-    .insert({
-      nombre: nombre.trim(),
-      codigo: codigo
-    })
-    .select()
-    .single();
-
-  if (error) {
-    alert('Error: ' + error.message);
-    return;
-  }
-
-  currentGroupId = data.id;
-  currentGroupName = data.nombre;
-
-  localStorage.setItem('grupo_id', currentGroupId);
-  localStorage.setItem('grupo_nombre', currentGroupName);
-
-  await loadGroups();
-  loadData();
-
-  alert(`Grupo creado.\nCódigo de acceso: ${data.codigo}`);
-}
-
-  async function deleteGroup() {
-  if (!currentGroupId) return alert('Selecciona un grupo');
-
-  const confirmar = confirm(`¿Seguro que quieres eliminar el grupo "${currentGroupName}"?`);
-  if (!confirmar) return;
-
-  const { error } = await db.from('grupos').delete().eq('id', currentGroupId);
-
-  if (error) {
-    alert('Error al eliminar grupo: ' + error.message);
-    return;
-  }
-
-  currentGroupId = null;
-  currentGroupName = 'Sin grupo';
-
-  localStorage.removeItem('grupo_id');
-  localStorage.removeItem('grupo_nombre');
-
-  await loadGroups();
-  loadData();
-
-  alert('Grupo eliminado');
-}
-
-  async function addMember() {
-    if (!currentGroupId) return alert('Primero pulsa + Nuevo');
-
-    const input = document.getElementById('nuevo-integrante');
-    const nombre = input.value.trim();
-    if (!nombre) return;
-
-    const { error } = await db.from('integrantes').insert({
-      nombre,
-      grupo_id: currentGroupId
-    });
-
-    if (error) {
-      alert('Error: ' + error.message);
-      return;
+      document.getElementById('total-gastado').innerText = total.toFixed(2) + ' €';
+      document.getElementById('total-movimientos').innerText = safeExpenses.length;
+      document.getElementById('por-persona').innerText = ((members && members.length) ? total / members.length : 0).toFixed(2) + ' €';
     }
 
-    input.value = '';
+    async function createGroup() {
+      const nombre = prompt('Nombre del grupo:');
+      if (!nombre || !nombre.trim()) return;
+
+      const codigo = generarCodigo();
+
+      const { data, error } = await db
+        .from('grupos')
+        .insert({
+          nombre: nombre.trim(),
+          codigo: codigo
+        })
+        .select()
+        .single();
+
+      if (error) {
+        alert('Error: ' + error.message);
+        return;
+      }
+
+      currentGroupId = data.id;
+      currentGroupName = data.nombre;
+
+      localStorage.setItem('grupo_id', currentGroupId);
+      localStorage.setItem('grupo_nombre', currentGroupName);
+
+      await loadGroups();
+      loadData();
+
+      alert(`Grupo creado.\nCódigo de acceso: ${data.codigo}`);
+    }
+
+    async function deleteGroup() {
+      if (!currentGroupId) return alert('Selecciona un grupo');
+
+      const confirmar = confirm(`¿Seguro que quieres eliminar el grupo "${currentGroupName}"?`);
+      if (!confirmar) return;
+
+      const { error } = await db.from('grupos').delete().eq('id', currentGroupId);
+
+      if (error) {
+        alert('Error al eliminar grupo: ' + error.message);
+        return;
+      }
+
+      currentGroupId = null;
+      currentGroupName = 'Sin grupo';
+
+      localStorage.removeItem('grupo_id');
+      localStorage.removeItem('grupo_nombre');
+
+      await loadGroups();
+      loadData();
+
+      alert('Grupo eliminado');
+    }
+
+    async function addMember() {
+      if (!currentGroupId) return alert('Primero pulsa + Nuevo');
+
+      const input = document.getElementById('nuevo-integrante');
+      const nombre = input.value.trim();
+      if (!nombre) return;
+
+      const { error } = await db.from('integrantes').insert({
+        nombre,
+        grupo_id: currentGroupId
+      });
+
+      if (error) {
+        alert('Error: ' + error.message);
+        return;
+      }
+
+      input.value = '';
+      loadData();
+    }
+
+    async function addExpense() {
+      if (!currentGroupId) return alert('Primero crea un grupo');
+
+      const descripcion = document.getElementById('gasto-descripcion').value.trim();
+      const importe = document.getElementById('gasto-importe').value;
+      const pagado_por = document.getElementById('gasto-pago').value;
+      const ticketFile = document.getElementById('gasto-ticket').files[0];
+
+      if (!descripcion || !importe || !pagado_por) return alert('Rellena todo');
+
+      let ticket_url = null;
+
+      if (ticketFile) {
+        const fileName = `${Date.now()}-${ticketFile.name}`;
+
+        const { error: uploadError } = await db.storage
+          .from('tickets')
+          .upload(fileName, ticketFile);
+
+        if (uploadError) {
+          alert('Error subiendo ticket: ' + uploadError.message);
+          return;
+        }
+
+        const { data: publicUrlData } = db.storage
+          .from('tickets')
+          .getPublicUrl(fileName);
+
+        ticket_url = publicUrlData.publicUrl;
+      }
+
+      const { error } = await db.from('gastos').insert({
+        descripcion,
+        importe: parseFloat(importe),
+        pagado_por,
+        grupo_id: currentGroupId,
+        ticket_url
+      });
+
+      if (error) {
+        alert('Error: ' + error.message);
+        return;
+      }
+
+      document.getElementById('gasto-descripcion').value = '';
+      document.getElementById('gasto-importe').value = '';
+      document.getElementById('gasto-pago').value = '';
+      document.getElementById('gasto-ticket').value = '';
+
+      loadData();
+    }
+
+    async function resolverPagos() {
+      if (!currentGroupId) return alert('Primero crea un grupo');
+
+      const { data: members, error: membersError } = await db
+        .from('integrantes')
+        .select('*')
+        .eq('grupo_id', currentGroupId);
+
+      if (membersError) {
+        alert('Error integrantes: ' + membersError.message);
+        return;
+      }
+
+      const { data: expenses, error: expensesError } = await db
+        .from('gastos')
+        .select('*')
+        .eq('grupo_id', currentGroupId);
+
+      if (expensesError) {
+        alert('Error gastos: ' + expensesError.message);
+        return;
+      }
+
+      if (!members.length || !expenses.length) {
+        document.getElementById('resultado-pagos').innerHTML =
+          '<div class="bg-yellow-100 text-yellow-800 p-3 rounded-lg">No hay datos suficientes.</div>';
+        return;
+      }
+
+      const total = expenses.reduce((sum, e) => sum + parseFloat(e.importe || 0), 0);
+      const porPersona = total / members.length;
+
+      const balance = {};
+
+      members.forEach(m => {
+        balance[m.id] = {
+          nombre: m.nombre,
+          pagado: 0,
+          debe: porPersona,
+          balance: 0
+        };
+      });
+
+      expenses.forEach(e => {
+        if (balance[e.pagado_por]) {
+          balance[e.pagado_por].pagado += parseFloat(e.importe || 0);
+        }
+      });
+
+      Object.keys(balance).forEach(id => {
+        balance[id].balance = balance[id].pagado - balance[id].debe;
+      });
+
+      const acreedores = [];
+      const deudores = [];
+
+      Object.values(balance).forEach(p => {
+        if (p.balance > 0.01) acreedores.push({ nombre: p.nombre, cantidad: p.balance });
+        if (p.balance < -0.01) deudores.push({ nombre: p.nombre, cantidad: Math.abs(p.balance) });
+      });
+
+      const pagos = [];
+      let i = 0;
+      let j = 0;
+
+      while (i < deudores.length && j < acreedores.length) {
+        const cantidad = Math.min(deudores[i].cantidad, acreedores[j].cantidad);
+
+        pagos.push({
+          deudor: deudores[i].nombre,
+          acreedor: acreedores[j].nombre,
+          cantidad: cantidad
+        });
+
+        deudores[i].cantidad -= cantidad;
+        acreedores[j].cantidad -= cantidad;
+
+        if (deudores[i].cantidad < 0.01) i++;
+        if (acreedores[j].cantidad < 0.01) j++;
+      }
+
+      const resultado = document.getElementById('resultado-pagos');
+
+      if (!pagos.length) {
+        resultado.innerHTML = '<div class="bg-green-100 text-green-800 p-3 rounded-lg">Todo está equilibrado.</div>';
+        return;
+      }
+
+      resultado.innerHTML = pagos.map(p => `
+        <div class="bg-[#1a262b] text-white p-3 rounded-lg flex justify-between items-center">
+          <span>${p.deudor} paga a ${p.acreedor}</span>
+          <span class="font-bold text-yellow-400">${p.cantidad.toFixed(2)} €</span>
+        </div>
+      `).join('');
+    }
+
+    async function joinGroupByCode() {
+      const codigo = document.getElementById('codigo-invitacion').value.trim().toUpperCase();
+      if (!codigo) return alert('Introduce un código');
+
+      const { data, error } = await db
+        .from('grupos')
+        .select('*')
+        .eq('codigo', codigo)
+        .single();
+
+      if (error || !data) {
+        alert('Código no válido');
+        return;
+      }
+
+      currentGroupId = data.id;
+      currentGroupName = data.nombre;
+
+      localStorage.setItem('grupo_id', currentGroupId);
+      localStorage.setItem('grupo_nombre', currentGroupName);
+
+      await loadGroups();
+      loadData();
+
+      document.getElementById('codigo-invitacion').value = '';
+      alert(`Te has unido al grupo "${data.nombre}"`);
+    }
+
+    loadGroups();
     loadData();
-  }
-
-  async function addExpense() {
-  if (!currentGroupId) return alert('Primero crea un grupo');
-
-  const descripcion = document.getElementById('gasto-descripcion').value.trim();
-  const importe = document.getElementById('gasto-importe').value;
-  const pagado_por = document.getElementById('gasto-pago').value;
-  const ticketFile = document.getElementById('gasto-ticket').files[0];
-
-  if (!descripcion || !importe || !pagado_por) return alert('Rellena todo');
-
-  let ticket_url = null;
-
-  if (ticketFile) {
-    const fileName = `${Date.now()}-${ticketFile.name}`;
-
-    const { error: uploadError } = await db.storage
-      .from('tickets')
-      .upload(fileName, ticketFile);
-
-    if (uploadError) {
-      alert('Error subiendo ticket: ' + uploadError.message);
-      return;
-    }
-
-    const { data: publicUrlData } = db.storage
-      .from('tickets')
-      .getPublicUrl(fileName);
-
-    ticket_url = publicUrlData.publicUrl;
-  }
-
-  const { error } = await db.from('gastos').insert({
-    descripcion,
-    importe: parseFloat(importe),
-    pagado_por,
-    grupo_id: currentGroupId,
-    ticket_url
-  });
-
-  if (error) {
-    alert('Error: ' + error.message);
-    return;
-  }
-
-  document.getElementById('gasto-descripcion').value = '';
-  document.getElementById('gasto-importe').value = '';
-  document.getElementById('gasto-pago').value = '';
-  document.getElementById('gasto-ticket').value = '';
-
-  loadData();
-}
-
-  async function joinGroupByCode() {
-  const codigo = document.getElementById('codigo-invitacion').value.trim().toUpperCase();
-  if (!codigo) return alert('Introduce un código');
-
-  const { data, error } = await db
-    .from('grupos')
-    .select('*')
-    .eq('codigo', codigo)
-    .single();
-
-  if (error || !data) {
-    alert('Código no válido');
-    return;
-  }
-
-  currentGroupId = data.id;
-  currentGroupName = data.nombre;
-
-  localStorage.setItem('grupo_id', currentGroupId);
-  localStorage.setItem('grupo_nombre', currentGroupName);
-
-  await loadGroups();
-  loadData();
-
-  document.getElementById('codigo-invitacion').value = '';
-  alert(`Te has unido al grupo "${data.nombre}"`);
-}
-
- async function resolverPagos() {
-  if (!currentGroupId) return alert('Primero crea un grupo');
-
-  const { data: members, error: membersError } = await db
-    .from('integrantes')
-    .select('*')
-    .eq('grupo_id', currentGroupId);
-
-  if (membersError) {
-    alert('Error integrantes: ' + membersError.message);
-    return;
-  }
-
-  const { data: expenses, error: expensesError } = await db
-    .from('gastos')
-    .select('*')
-    .eq('grupo_id', currentGroupId);
-
-  if (expensesError) {
-    alert('Error gastos: ' + expensesError.message);
-    return;
-  }
-
-  if (!members.length || !expenses.length) {
-    document.getElementById('resultado-pagos').innerHTML =
-      '<div class="bg-yellow-100 text-yellow-800 p-3 rounded-lg">No hay datos suficientes.</div>';
-    return;
-  }
-
-  const total = expenses.reduce((sum, e) => sum + parseFloat(e.importe || 0), 0);
-  const porPersona = total / members.length;
-
-  const balance = {};
-
-  members.forEach(m => {
-    balance[m.id] = {
-      nombre: m.nombre,
-      pagado: 0,
-      debe: porPersona,
-      balance: 0
-    };
-  });
-
-  expenses.forEach(e => {
-    if (balance[e.pagado_por]) {
-      balance[e.pagado_por].pagado += parseFloat(e.importe || 0);
-    }
-  });
-
-  Object.keys(balance).forEach(id => {
-    balance[id].balance = balance[id].pagado - balance[id].debe;
-  });
-
-  const acreedores = [];
-  const deudores = [];
-
-  Object.values(balance).forEach(p => {
-    if (p.balance > 0.01) acreedores.push({ nombre: p.nombre, cantidad: p.balance });
-    if (p.balance < -0.01) deudores.push({ nombre: p.nombre, cantidad: Math.abs(p.balance) });
-  });
-
-  const pagos = [];
-  let i = 0;
-  let j = 0;
-
-  while (i < deudores.length && j < acreedores.length) {
-    const cantidad = Math.min(deudores[i].cantidad, acreedores[j].cantidad);
-
-    pagos.push({
-      deudor: deudores[i].nombre,
-      acreedor: acreedores[j].nombre,
-      cantidad: cantidad
-    });
-
-    deudores[i].cantidad -= cantidad;
-    acreedores[j].cantidad -= cantidad;
-
-    if (deudores[i].cantidad < 0.01) i++;
-    if (acreedores[j].cantidad < 0.01) j++;
-  }
-
-  const resultado = document.getElementById('resultado-pagos');
-
-  if (!pagos.length) {
-    resultado.innerHTML = '<div class="bg-green-100 text-green-800 p-3 rounded-lg">Todo está equilibrado.</div>';
-    return;
-  }
-
-  resultado.innerHTML = pagos.map(p => `
-    <div class="bg-[#1a262b] text-white p-3 rounded-lg flex justify-between items-center">
-      <span>${p.deudor} paga a ${p.acreedor}</span>
-      <span class="font-bold text-yellow-400">${p.cantidad.toFixed(2)} €</span>
-    </div>
-  `).join('');
-}
-  
-  loadGroups();
-loadData();
-</script>
+  </script>
 </body>
 </html>
