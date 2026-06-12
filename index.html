@@ -19,37 +19,37 @@
 <body class="p-4 md:p-8">
 
   <!-- Header -->
-  <div class="flex justify-between items-center mb-8 gap-2 flex-wrap">
-    <div class="flex items-center gap-2 bg-yellow-400 text-black px-3 py-2 rounded-full font-bold text-sm">
-      📁
-      <select id="selector-grupo" onchange="changeGroup()" class="bg-yellow-400 text-black font-bold outline-none">
-        <option value="">Sin grupo</option>
-      </select>
-    </div>
+  <div class="flex justify-between items-start mb-8 gap-3 flex-wrap">
+  <div class="flex items-center gap-2 bg-yellow-400 text-black px-4 py-2 rounded-full font-bold text-sm min-w-[180px]">
+    📁
+    <select id="selector-grupo" onchange="changeGroup()" class="bg-yellow-400 text-black font-bold outline-none w-full">
+      <option value="">Sin grupo</option>
+    </select>
+  </div>
 
-    <div class="flex gap-2">
-      <button onclick="createGroup()" class="btn-primary px-4 py-2 rounded-full text-sm">+ Nuevo</button>
-      <button onclick="deleteGroup()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full text-sm font-bold">
-        Eliminar
+  <div class="relative">
+    <button onclick="toggleInviteMenu()" class="bg-lime-400 hover:bg-lime-300 text-black px-4 py-2 rounded-xl text-sm font-extrabold shadow-md">
+      INVITAR
+    </button>
+
+    <div id="invite-menu" class="hidden absolute right-0 mt-2 w-44 bg-white text-black rounded-xl shadow-xl overflow-hidden z-50">
+      <button onclick="copyInviteLink()" class="block w-full text-left px-4 py-3 hover:bg-gray-100 text-sm font-semibold">
+        Copiar enlace
+      </button>
+      <button onclick="shareWhatsApp()" class="block w-full text-left px-4 py-3 hover:bg-gray-100 text-sm font-semibold">
+        Enviar WhatsApp
       </button>
     </div>
   </div>
-
-  <div id="panel-compartir" class="hidden card p-4 md:p-6 mb-6">
-  <h2 class="text-lg font-bold mb-3">Invitar al grupo</h2>
-  <p class="text-sm text-gray-300 mb-2">
-    Código: <span id="codigo-mostrado" class="font-bold text-yellow-400"></span>
-  </p>
-  <input id="link-invitacion" type="text" readonly class="input-field text-sm mb-3">
-  <div class="flex gap-2 flex-wrap">
-    <button onclick="copyInviteLink()" class="btn-primary px-4 py-2 rounded-lg text-sm">
-      Copiar
-    </button>
-    <button onclick="shareWhatsApp()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-bold">
-      WhatsApp
-    </button>
-  </div>
 </div>
+
+<div class="flex gap-2 mb-6">
+  <button onclick="createGroup()" class="btn-primary px-4 py-2 rounded-full text-sm">+ Nuevo</button>
+  <button onclick="deleteGroup()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full text-sm font-bold">
+    Eliminar
+  </button>
+</div>
+  </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <div class="lg:col-span-2 space-y-6">
@@ -156,27 +156,88 @@
     }
 
     async function loadGroups() {
-      const { data: groups, error } = await db
-        .from('grupos')
-        .select('*')
-        .order('created_at', { ascending: true });
+  const { data: groups, error } = await db
+    .from('grupos')
+    .select('*')
+    .order('created_at', { ascending: true });
 
-      if (error) {
-        alert('Error cargando grupos: ' + error.message);
-        return;
-      }
+  if (error) {
+    alert('Error cargando grupos: ' + error.message);
+    return;
+  }
 
-      const selector = document.getElementById('selector-grupo');
-      selector.innerHTML = '<option value="">Sin grupo</option>';
+  const selector = document.getElementById('selector-grupo');
+  selector.innerHTML = '<option value="">Sin grupo</option>';
 
-      (groups || []).forEach(group => {
-        selector.innerHTML += `<option value="${group.id}">${group.nombre}</option>`;
-      });
+  (groups || []).forEach(group => {
+    selector.innerHTML += `<option value="${group.id}" data-codigo="${group.codigo || ''}">${group.nombre}</option>`;
+  });
 
-      if (currentGroupId) {
-        selector.value = currentGroupId;
-      }
-    }
+  if (currentGroupId) {
+    selector.value = currentGroupId;
+  }
+}
+
+    function getCurrentGroupCode() {
+  const selector = document.getElementById('selector-grupo');
+  const selectedOption = selector.options[selector.selectedIndex];
+  return selectedOption?.dataset?.codigo || null;
+}
+
+function getCurrentInviteLink() {
+  const codigo = getCurrentGroupCode();
+  if (!codigo) return null;
+  return `${window.location.origin}/?codigo=${codigo}`;
+}
+
+function toggleInviteMenu() {
+  if (!currentGroupId) {
+    alert('Primero selecciona o crea un grupo');
+    return;
+  }
+
+  const menu = document.getElementById('invite-menu');
+  menu.classList.toggle('hidden');
+}
+
+async function copyInviteLink() {
+  const link = getCurrentInviteLink();
+
+  if (!link) {
+    alert('No hay grupo seleccionado');
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(link);
+    alert('Enlace copiado');
+    document.getElementById('invite-menu').classList.add('hidden');
+  } catch (e) {
+    alert('No se pudo copiar el enlace');
+  }
+}
+
+function shareWhatsApp() {
+  const link = getCurrentInviteLink();
+
+  if (!link) {
+    alert('No hay grupo seleccionado');
+    return;
+  }
+
+  const texto = encodeURIComponent(`Únete a mi grupo en Cuenta Clara: ${link}`);
+  window.open(`https://wa.me/?text=${texto}`, '_blank');
+  document.getElementById('invite-menu').classList.add('hidden');
+}
+
+document.addEventListener('click', function (event) {
+  const menu = document.getElementById('invite-menu');
+  const button = event.target.closest('button');
+
+  if (!event.target.closest('#invite-menu') && !button?.onclick?.toString().includes('toggleInviteMenu')) {
+    menu?.classList.add('hidden');
+  }
+});
 
     function changeGroup() {
       const selector = document.getElementById('selector-grupo');
@@ -309,35 +370,7 @@ const membersMap = {};
   await loadGroups();
   loadData();
 
-  mostrarPanelCompartir(data.codigo);
-}
-
-    function mostrarPanelCompartir(codigo) {
-  const panel = document.getElementById('panel-compartir');
-  const codigoMostrado = document.getElementById('codigo-mostrado');
-  const linkInput = document.getElementById('link-invitacion');
-
-  const link = `${window.location.origin}/?codigo=${codigo}`;
-
-  codigoMostrado.innerText = codigo;
-  linkInput.value = link;
-  panel.classList.remove('hidden');
-}
-
-async function copyInviteLink() {
-  const link = document.getElementById('link-invitacion').value;
-  try {
-    await navigator.clipboard.writeText(link);
-    alert('Enlace copiado');
-  } catch (e) {
-    alert('No se pudo copiar el enlace');
-  }
-}
-
-function shareWhatsApp() {
-  const link = document.getElementById('link-invitacion').value;
-  const texto = encodeURIComponent(`Únete a mi grupo en Cuenta Clara: ${link}`);
-  window.open(`https://wa.me/?text=${texto}`, '_blank');
+  alert(`Grupo creado.\nCódigo: ${data.codigo}`);
 }
 
     async function autoJoinByUrlCode() {
