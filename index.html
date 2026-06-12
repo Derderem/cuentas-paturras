@@ -20,12 +20,20 @@
 
   <!-- Header -->
   <div class="flex justify-between items-start mb-8 gap-3 flex-wrap">
-  <div class="flex items-center gap-2 bg-yellow-400 text-black px-4 py-2 rounded-full font-bold text-sm min-w-[180px]">
-    📁
-    <select id="selector-grupo" onchange="changeGroup()" class="bg-yellow-400 text-black font-bold outline-none w-full">
-      <option value="">Sin grupo</option>
-    </select>
+  <div class="relative">
+  <button onclick="toggleGroupMenu()" id="group-button"
+    class="flex items-center justify-between gap-3 bg-yellow-400 text-black px-4 py-3 rounded-full font-bold text-sm min-w-[180px] shadow-md">
+    <span class="flex items-center gap-2">
+      <span>📁</span>
+      <span id="grupo-seleccionado-texto">Sin grupo</span>
+    </span>
+    <span>⌄</span>
+  </button>
+
+  <div id="group-menu" class="hidden absolute left-0 mt-2 w-64 bg-[#24343a] border border-[#3a4b51] rounded-2xl shadow-2xl overflow-hidden z-50">
+    <div id="group-options" class="py-2"></div>
   </div>
+</div>
 
   <div class="relative">
     <button onclick="toggleInviteMenu()" class="bg-lime-400 hover:bg-lime-300 text-black px-4 py-2 rounded-xl text-sm font-extrabold shadow-md">
@@ -144,6 +152,8 @@
   </div>
 
   <script>
+    let allGroups = [];
+    
     const SUPABASE_URL = 'https://tnlsxnuavtofejejoydq.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRubHN4bnVhdnRvZmVqZWpveWRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMTY3MjMsImV4cCI6MjA5NjU5MjcyM30.U0Fd-4sgMpAU7yBcgvOwiqsg_cC1JZ4LmE4KST5hMbw';
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -155,7 +165,7 @@
       return Math.random().toString(36).substring(2, 8).toUpperCase();
     }
 
-    async function loadGroups() {
+  async function loadGroups() {
   const { data: groups, error } = await db
     .from('grupos')
     .select('*')
@@ -166,24 +176,65 @@
     return;
   }
 
-  const selector = document.getElementById('selector-grupo');
-  selector.innerHTML = '<option value="">Sin grupo</option>';
+  allGroups = groups || [];
 
-  (groups || []).forEach(group => {
-    selector.innerHTML += `<option value="${group.id}" data-codigo="${group.codigo || ''}">${group.nombre}</option>`;
+  const options = document.getElementById('group-options');
+  const selectedText = document.getElementById('grupo-seleccionado-texto');
+
+  options.innerHTML = '';
+
+  options.innerHTML += `
+    <button onclick="selectGroup('', 'Sin grupo')" 
+      class="w-full flex justify-between items-center px-4 py-3 text-left hover:bg-[#2f4349] text-white">
+      <span>Sin grupo</span>
+      ${!currentGroupId ? '<span class="text-yellow-400 font-bold">✓</span>' : ''}
+    </button>
+  `;
+
+  allGroups.forEach(group => {
+    options.innerHTML += `
+      <button onclick="selectGroup('${group.id}', '${group.nombre.replace(/'/g, "\\'")}')" 
+        class="w-full flex justify-between items-center px-4 py-3 text-left hover:bg-[#2f4349] text-white">
+        <span>${group.nombre}</span>
+        ${currentGroupId == group.id ? '<span class="text-yellow-400 font-bold">✓</span>' : ''}
+      </button>
+    `;
   });
 
+  selectedText.innerText = currentGroupName || 'Sin grupo';
+}
+
+    function toggleGroupMenu() {
+  const menu = document.getElementById('group-menu');
+  menu.classList.toggle('hidden');
+}
+
+function closeGroupMenu() {
+  document.getElementById('group-menu')?.classList.add('hidden');
+}
+
+function selectGroup(groupId, groupName) {
+  currentGroupId = groupId || null;
+  currentGroupName = groupName || 'Sin grupo';
+
   if (currentGroupId) {
-    selector.value = currentGroupId;
+    localStorage.setItem('grupo_id', currentGroupId);
+    localStorage.setItem('grupo_nombre', currentGroupName);
+  } else {
+    localStorage.removeItem('grupo_id');
+    localStorage.removeItem('grupo_nombre');
   }
+
+  document.getElementById('grupo-seleccionado-texto').innerText = currentGroupName;
+  closeGroupMenu();
+  loadData();
 }
 
     function getCurrentGroupCode() {
-  const selector = document.getElementById('selector-grupo');
-  const selectedOption = selector.options[selector.selectedIndex];
-  return selectedOption?.dataset?.codigo || null;
+  const grupo = allGroups.find(g => g.id == currentGroupId);
+  return grupo ? grupo.codigo : null;
 }
-
+    
 function getCurrentInviteLink() {
   const codigo = getCurrentGroupCode();
   if (!codigo) return null;
@@ -238,24 +289,6 @@ document.addEventListener('click', function (event) {
     menu?.classList.add('hidden');
   }
 });
-
-    function changeGroup() {
-      const selector = document.getElementById('selector-grupo');
-      const selectedOption = selector.options[selector.selectedIndex];
-
-      currentGroupId = selector.value || null;
-      currentGroupName = selector.value ? selectedOption.text : 'Sin grupo';
-
-      if (currentGroupId) {
-        localStorage.setItem('grupo_id', currentGroupId);
-        localStorage.setItem('grupo_nombre', currentGroupName);
-      } else {
-        localStorage.removeItem('grupo_id');
-        localStorage.removeItem('grupo_nombre');
-      }
-
-      loadData();
-    }
 
     async function loadData() {
      if (!currentGroupId) {
@@ -598,6 +631,22 @@ const membersMap = {};
   await autoJoinByUrlCode();
   await loadData();
 })();
+
+    document.addEventListener('click', function (event) {
+  const groupMenu = document.getElementById('group-menu');
+  const groupButton = document.getElementById('group-button');
+
+  if (groupMenu && groupButton && !groupMenu.contains(event.target) && !groupButton.contains(event.target)) {
+    groupMenu.classList.add('hidden');
+  }
+
+  const inviteMenu = document.getElementById('invite-menu');
+  const inviteButton = event.target.closest('button');
+
+  if (!event.target.closest('#invite-menu') && !inviteButton?.onclick?.toString().includes('toggleInviteMenu')) {
+    inviteMenu?.classList.add('hidden');
+  }
+});
   </script>
 </body>
 </html>
