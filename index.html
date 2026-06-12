@@ -560,31 +560,6 @@ function shareWhatsApp() {
       `).join('');
     }
 
-    async function joinGroupByCode() {
-      const codigo = document.getElementById('codigo-invitacion').value.trim().toUpperCase();
-      if (!codigo) return alert('Introduce un código');
-
-      const { data, error } = await db
-        .from('grupos')
-        .select('*')
-        .eq('codigo', codigo)
-        .single();
-
-      if (error || !data) {
-        alert('Código no válido');
-        return;
-      }
-
-      currentGroupId = data.id;
-      currentGroupName = data.nombre;
-
-      localStorage.setItem('grupo_id', currentGroupId);
-      localStorage.setItem('grupo_nombre', currentGroupName);
-
-      await loadGroups();
-      loadData();
-    }
-
     (async () => {
   await loadGroups();
   await autoJoinByUrlCode();
