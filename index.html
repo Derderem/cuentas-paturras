@@ -98,6 +98,11 @@
       </div>
     </div>
 
+    <div class="card p-4 md:p-6">
+  <h2 class="text-lg md:text-xl font-bold mb-4">🧾 Gastos y tickets</h2>
+  <div id="lista-gastos" class="space-y-3"></div>
+</div>
+
     <!-- DERECHA -->
     <div class="space-y-6">
       <div class="bg-white text-black p-4 md:p-6 rounded-3xl">
@@ -187,15 +192,16 @@
     }
 
     async function loadData() {
-      if (!currentGroupId) {
-        document.getElementById('lista-integrantes').innerHTML = '';
-        document.getElementById('gasto-pago').innerHTML = '<option value="">¿Quién pagó?</option>';
-        document.getElementById('resultado-pagos').innerHTML = '';
-        document.getElementById('total-gastado').innerText = '0,00 €';
-        document.getElementById('total-movimientos').innerText = '0';
-        document.getElementById('por-persona').innerText = '0,00 €';
-        return;
-      }
+     if (!currentGroupId) {
+  document.getElementById('lista-integrantes').innerHTML = '';
+  document.getElementById('gasto-pago').innerHTML = '<option value="">¿Quién pagó?</option>';
+  document.getElementById('resultado-pagos').innerHTML = '';
+  document.getElementById('lista-gastos').innerHTML = '';
+  document.getElementById('total-gastado').innerText = '0,00 €';
+  document.getElementById('total-movimientos').innerText = '0';
+  document.getElementById('por-persona').innerText = '0,00 €';
+  return;
+}
 
       const { data: members, error: membersError } = await db
         .from('integrantes')
@@ -227,6 +233,39 @@
         alert('Error gastos: ' + expensesError.message);
         return;
       }
+
+      const listaGastos = document.getElementById('lista-gastos');
+listaGastos.innerHTML = '';
+      if (!expenses || !expenses.length) {
+  listaGastos.innerHTML = '<div class="text-gray-400 text-sm">Todavía no hay gastos en este grupo.</div>';
+}
+
+const membersMap = {};
+(members || []).forEach(m => {
+  membersMap[m.id] = m.nombre;
+});
+
+(expenses || []).forEach(gasto => {
+  listaGastos.innerHTML += `
+    <div class="bg-[#1a262b] p-3 rounded-xl border border-gray-700">
+      <div class="flex justify-between items-start gap-3">
+        <div>
+          <p class="font-bold text-white text-sm md:text-base">${gasto.descripcion}</p>
+          <p class="text-gray-300 text-xs md:text-sm">
+            ${membersMap[gasto.pagado_por] || 'Desconocido'} pagó ${parseFloat(gasto.importe).toFixed(2)} €
+          </p>
+        </div>
+        ${gasto.ticket_url ? `
+          <a href="${gasto.ticket_url}" target="_blank" class="bg-yellow-400 text-black px-3 py-1 rounded-lg text-xs font-bold whitespace-nowrap">
+            Ver ticket
+          </a>
+        ` : `
+          <span class="text-gray-500 text-xs whitespace-nowrap">Sin ticket</span>
+        `}
+      </div>
+    </div>
+  `;
+});
 
       const safeExpenses = expenses || [];
       const total = safeExpenses.reduce((a, c) => a + parseFloat(c.importe || 0), 0);
