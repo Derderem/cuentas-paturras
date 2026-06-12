@@ -433,29 +433,65 @@ const membersMap = {};
 }
     
     async function deleteGroup() {
-      if (!currentGroupId) return alert('Selecciona un grupo');
+  if (!currentGroupId) return alert('Selecciona un grupo');
 
-      const confirmar = confirm(`¿Seguro que quieres eliminar el grupo "${currentGroupName}"?`);
-      if (!confirmar) return;
+  const confirmar = confirm(`¿Seguro que quieres eliminar el grupo "${currentGroupName}"?`);
+  if (!confirmar) return;
 
-      const { error } = await db.from('grupos').delete().eq('id', currentGroupId);
+  // 1. Buscar gastos del grupo
+  const { data: expenses, error: expensesError } = await db
+    .from('gastos')
+    .select('ticket_url')
+    .eq('grupo_id', currentGroupId);
 
-      if (error) {
-        alert('Error al eliminar grupo: ' + error.message);
-        return;
-      }
+  if (expensesError) {
+    alert('Error al buscar gastos: ' + expensesError.message);
+    return;
+  }
 
-      currentGroupId = null;
-      currentGroupName = 'Sin grupo';
+  // 2. Sacar nombres de archivos del bucket
+  const filesToDelete = (expenses || [])
+    .map(e => {
+      if (!e.ticket_url) return null;
+      const parts = e.ticket_url.split('/tickets/');
+      return parts[1] || null;
+    })
+    .filter(Boolean);
 
-      localStorage.removeItem('grupo_id');
-      localStorage.removeItem('grupo_nombre');
+  // 3. Borrar archivos del bucket si existen
+  if (filesToDelete.length > 0) {
+    const { error: storageError } = await db.storage
+      .from('tickets')
+      .remove(filesToDelete);
 
-      await loadGroups();
-      loadData();
-
-      alert('Grupo eliminado');
+    if (storageError) {
+      alert('Error al borrar tickets: ' + storageError.message);
+      return;
     }
+  }
+
+  // 4. Borrar grupo
+  const { error } = await db
+    .from('grupos')
+    .delete()
+    .eq('id', currentGroupId);
+
+  if (error) {
+    alert('Error al eliminar grupo: ' + error.message);
+    return;
+  }
+
+  currentGroupId = null;
+  currentGroupName = 'Sin grupo';
+
+  localStorage.removeItem('grupo_id');
+  localStorage.removeItem('grupo_nombre');
+
+  await loadGroups();
+  loadData();
+
+  alert('Grupo y archivos eliminados');
+}
 
     async function addMember() {
       if (!currentGroupId) return alert('Primero pulsa + Nuevo');
