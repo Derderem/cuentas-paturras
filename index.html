@@ -35,16 +35,21 @@
     </div>
   </div>
 
-  <!-- Unirse por código -->
-  <div class="card p-4 md:p-6 mb-6">
-    <h2 class="text-lg font-bold mb-3">Unirse a un grupo</h2>
-    <div class="flex gap-2">
-      <input id="codigo-invitacion" type="text" placeholder="Introduce código" class="input-field text-sm uppercase">
-      <button onclick="joinGroupByCode()" class="btn-primary px-4 py-2 rounded-lg text-sm">
-        Unirse
-      </button>
-    </div>
+  <div id="panel-compartir" class="hidden card p-4 md:p-6 mb-6">
+  <h2 class="text-lg font-bold mb-3">Invitar al grupo</h2>
+  <p class="text-sm text-gray-300 mb-2">
+    Código: <span id="codigo-mostrado" class="font-bold text-yellow-400"></span>
+  </p>
+  <input id="link-invitacion" type="text" readonly class="input-field text-sm mb-3">
+  <div class="flex gap-2 flex-wrap">
+    <button onclick="copyInviteLink()" class="btn-primary px-4 py-2 rounded-lg text-sm">
+      Copiar
+    </button>
+    <button onclick="shareWhatsApp()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-bold">
+      WhatsApp
+    </button>
   </div>
+</div>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <div class="lg:col-span-2 space-y-6">
@@ -276,37 +281,91 @@ const membersMap = {};
     }
 
     async function createGroup() {
-      const nombre = prompt('Nombre del grupo:');
-      if (!nombre || !nombre.trim()) return;
+  const nombre = prompt('Nombre del grupo:');
+  if (!nombre || !nombre.trim()) return;
 
-      const codigo = generarCodigo();
+  const codigo = generarCodigo();
 
-      const { data, error } = await db
-        .from('grupos')
-        .insert({
-          nombre: nombre.trim(),
-          codigo: codigo
-        })
-        .select()
-        .single();
+  const { data, error } = await db
+    .from('grupos')
+    .insert({
+      nombre: nombre.trim(),
+      codigo: codigo
+    })
+    .select()
+    .single();
 
-      if (error) {
-        alert('Error: ' + error.message);
-        return;
-      }
+  if (error) {
+    alert('Error: ' + error.message);
+    return;
+  }
 
-      currentGroupId = data.id;
-      currentGroupName = data.nombre;
+  currentGroupId = data.id;
+  currentGroupName = data.nombre;
 
-      localStorage.setItem('grupo_id', currentGroupId);
-      localStorage.setItem('grupo_nombre', currentGroupName);
+  localStorage.setItem('grupo_id', currentGroupId);
+  localStorage.setItem('grupo_nombre', currentGroupName);
 
-      await loadGroups();
-      loadData();
+  await loadGroups();
+  loadData();
 
-      alert(`Grupo creado.\nCódigo de acceso: ${data.codigo}`);
-    }
+  mostrarPanelCompartir(data.codigo);
+}
 
+    function mostrarPanelCompartir(codigo) {
+  const panel = document.getElementById('panel-compartir');
+  const codigoMostrado = document.getElementById('codigo-mostrado');
+  const linkInput = document.getElementById('link-invitacion');
+
+  const link = `${window.location.origin}/?codigo=${codigo}`;
+
+  codigoMostrado.innerText = codigo;
+  linkInput.value = link;
+  panel.classList.remove('hidden');
+}
+
+async function copyInviteLink() {
+  const link = document.getElementById('link-invitacion').value;
+  try {
+    await navigator.clipboard.writeText(link);
+    alert('Enlace copiado');
+  } catch (e) {
+    alert('No se pudo copiar el enlace');
+  }
+}
+
+function shareWhatsApp() {
+  const link = document.getElementById('link-invitacion').value;
+  const texto = encodeURIComponent(`Únete a mi grupo en Cuenta Clara: ${link}`);
+  window.open(`https://wa.me/?text=${texto}`, '_blank');
+}
+
+    async function autoJoinByUrlCode() {
+  const params = new URLSearchParams(window.location.search);
+  const codigo = params.get('codigo');
+
+  if (!codigo) return;
+
+  const { data, error } = await db
+    .from('grupos')
+    .select('*')
+    .eq('codigo', codigo.toUpperCase())
+    .single();
+
+  if (error || !data) return;
+
+  currentGroupId = data.id;
+  currentGroupName = data.nombre;
+
+  localStorage.setItem('grupo_id', currentGroupId);
+  localStorage.setItem('grupo_nombre', currentGroupName);
+
+  await loadGroups();
+  loadData();
+
+  mostrarPanelCompartir(data.codigo);
+}
+    
     async function deleteGroup() {
       if (!currentGroupId) return alert('Selecciona un grupo');
 
@@ -524,13 +583,13 @@ const membersMap = {};
 
       await loadGroups();
       loadData();
-
-      document.getElementById('codigo-invitacion').value = '';
-      alert(`Te has unido al grupo "${data.nombre}"`);
     }
 
-    loadGroups();
-    loadData();
+    (async () => {
+  await loadGroups();
+  await autoJoinByUrlCode();
+  await loadData();
+})();
   </script>
 </body>
 </html>
