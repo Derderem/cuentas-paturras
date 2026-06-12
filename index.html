@@ -685,5 +685,26 @@ const membersMap = {};
 });
     
   </script>
+  <!-- Modal crear grupo -->
+<div id="modal-crear-grupo" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+  <div class="bg-[#24343a] w-full max-w-sm rounded-3xl p-6 shadow-2xl">
+    <h2 class="text-xl font-bold mb-4 text-white">Crear nuevo grupo</h2>
+    <input id="input-nombre-grupo" type="text" placeholder="Nombre del grupo" class="input-field text-sm mb-4">
+    <div class="flex gap-2 justify-end">
+      <button onclick="closeCreateGroupModal()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-xl text-sm font-bold">
+        Cancelar
+      </button>
+      <button onclick="confirmCreateGroup()" class="btn-primary px-4 py-2 rounded-xl text-sm">
+        Crear
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Mensaje grupo creado -->
+<div id="toast-grupo-creado" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-green-600 text-white px-5 py-3 rounded-2xl shadow-xl z-50 font-bold text-sm">
+  ✅ Grupo creado
+</div>
+
 </body>
 </html>
