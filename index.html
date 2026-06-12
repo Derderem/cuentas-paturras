@@ -52,7 +52,7 @@
 </div>
 
 <div class="flex gap-2 mb-6">
-  <button onclick="createGroup()" class="btn-primary px-4 py-2 rounded-full text-sm">+ Nuevo</button>
+  <button onclick="openCreateGroupModal()" class="btn-primary px-4 py-2 rounded-full text-sm">+ Nuevo</button>
   <button onclick="deleteGroup()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full text-sm font-bold">
     Eliminar
   </button>
@@ -683,6 +683,7 @@ const membersMap = {};
     inviteMenu?.classList.add('hidden');
   }
 });
+    
   </script>
 </body>
 </html>
