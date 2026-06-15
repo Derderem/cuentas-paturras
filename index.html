@@ -374,16 +374,16 @@ const membersMap = {};
       document.getElementById('por-persona').innerText = ((members && members.length) ? total / members.length : 0).toFixed(2) + ' €';
     }
 
-    async function createGroup() {
-  const nombre = prompt('Nombre del grupo:');
-  if (!nombre || !nombre.trim()) return;
+   async function createGroup(nombreManual = null) {
+  const nombre = nombreManual?.trim();
+  if (!nombre) return;
 
   const codigo = generarCodigo();
 
   const { data, error } = await db
     .from('grupos')
     .insert({
-      nombre: nombre.trim(),
+      nombre: nombre,
       codigo: codigo
     })
     .select()
@@ -403,9 +403,40 @@ const membersMap = {};
   await loadGroups();
   loadData();
 
-  alert(`Grupo creado.\nCódigo: ${data.codigo}`);
+  closeCreateGroupModal();
+  showGroupCreatedToast();
 }
 
+    function openCreateGroupModal() {
+  document.getElementById('modal-crear-grupo').classList.remove('hidden');
+  setTimeout(() => {
+    document.getElementById('input-nombre-grupo')?.focus();
+  }, 100);
+}
+
+function closeCreateGroupModal() {
+  document.getElementById('modal-crear-grupo').classList.add('hidden');
+  document.getElementById('input-nombre-grupo').value = '';
+}
+
+function confirmCreateGroup() {
+  const nombre = document.getElementById('input-nombre-grupo').value.trim();
+  if (!nombre) {
+    alert('Escribe un nombre para el grupo');
+    return;
+  }
+  createGroup(nombre);
+}
+
+function showGroupCreatedToast() {
+  const toast = document.getElementById('toast-grupo-creado');
+  toast.classList.remove('hidden');
+
+  setTimeout(() => {
+    toast.classList.add('hidden');
+  }, 2200);
+}
+    
     async function autoJoinByUrlCode() {
   const params = new URLSearchParams(window.location.search);
   const codigo = params.get('codigo');
