@@ -422,7 +422,6 @@ function closeCreateGroupModal() {
 function confirmCreateGroup() {
   const nombre = document.getElementById('input-nombre-grupo').value.trim();
   if (!nombre) {
-    alert('Escribe un nombre para el grupo');
     return;
   }
   createGroup(nombre);
@@ -459,8 +458,6 @@ function showGroupCreatedToast() {
 
   await loadGroups();
   loadData();
-
-  mostrarPanelCompartir(data.codigo);
 }
     
     async function deleteGroup() {
@@ -469,7 +466,7 @@ function showGroupCreatedToast() {
   const confirmar = confirm(`¿Seguro que quieres eliminar el grupo "${currentGroupName}"?`);
   if (!confirmar) return;
 
-  // 1. Buscar gastos del grupo
+  // 1. Buscar gastos del grup
   const { data: expenses, error: expensesError } = await db
     .from('gastos')
     .select('ticket_url')
