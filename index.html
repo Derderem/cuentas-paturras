@@ -53,9 +53,9 @@
 
 <div class="flex gap-2 mb-6">
   <button onclick="openCreateGroupModal()" class="btn-primary px-4 py-2 rounded-full text-sm">+ Nuevo</button>
-  <button onclick="deleteGroup()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full text-sm font-bold">
-    Eliminar
-  </button>
+  <button onclick="openDeleteGroupModal()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full text-sm font-bold">
+  Eliminar
+</button>
 </div>
   </div>
 
@@ -268,6 +268,27 @@ async function copyInviteLink() {
   }
 }
 
+    function openDeleteGroupModal() {
+  if (!currentGroupId) {
+    alert('Selecciona un grupo');
+    return;
+  }
+
+  document.getElementById('texto-eliminar-grupo').innerText =
+    `¿Quieres eliminar el grupo "${currentGroupName}"?`;
+
+  document.getElementById('modal-eliminar-grupo').classList.remove('hidden');
+}
+
+function closeDeleteGroupModal() {
+  document.getElementById('modal-eliminar-grupo').classList.add('hidden');
+}
+
+async function confirmDeleteGroup() {
+  closeDeleteGroupModal();
+  await deleteGroup();
+}
+
 function shareWhatsApp() {
   const link = getCurrentInviteLink();
 
@@ -462,9 +483,6 @@ function showGroupCreatedToast() {
     
     async function deleteGroup() {
   if (!currentGroupId) return alert('Selecciona un grupo');
-
-  const confirmar = confirm(`¿Seguro que quieres eliminar el grupo "${currentGroupName}"?`);
-  if (!confirmar) return;
 
   // 1. Buscar gastos del grup
   const { data: expenses, error: expensesError } = await db
@@ -732,6 +750,25 @@ function showGroupCreatedToast() {
 <!-- Mensaje grupo creado -->
 <div id="toast-grupo-creado" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-green-600 text-white px-5 py-3 rounded-2xl shadow-xl z-50 font-bold text-sm">
   ✅ Grupo creado
+</div>
+
+<!-- Modal eliminar grupo -->
+<div id="modal-eliminar-grupo" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+  <div class="bg-[#24343a] w-full max-w-sm rounded-3xl p-6 shadow-2xl text-white">
+    <h2 class="text-xl font-bold mb-4">Eliminar grupo</h2>
+    <p id="texto-eliminar-grupo" class="text-sm text-gray-300 mb-6">
+      ¿Quieres eliminar el grupo?
+    </p>
+
+    <div class="flex gap-2 justify-end">
+      <button onclick="closeDeleteGroupModal()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-xl text-sm font-bold">
+        Cancelar
+      </button>
+      <button onclick="confirmDeleteGroup()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-sm font-bold">
+        Eliminar
+      </button>
+    </div>
+  </div>
 </div>
 
 </body>
