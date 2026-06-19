@@ -1,7 +1,7 @@
 {
   "name": "Cuenta Clara",
   "short_name": "CuentaClara"
-  "start_url": "/",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#1a262b",
   "theme_color": "#1a262b",
