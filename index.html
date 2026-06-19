@@ -164,11 +164,34 @@
     let currentGroupId = localStorage.getItem('grupo_id');
     let currentGroupName = localStorage.getItem('grupo_nombre') || 'Sin grupo';
 
+    let invitedGroupOnly = null;
+
     function generarCodigo() {
       return Math.random().toString(36).substring(2, 8).toUpperCase();
     }
 
   async function loadGroups() {
+  const options = document.getElementById('group-options');
+  const selectedText = document.getElementById('grupo-seleccionado-texto');
+
+  options.innerHTML = '';
+
+  // Si ha entrado por invitación, solo mostrar ese grupo
+  if (invitedGroupOnly) {
+    allGroups = [invitedGroupOnly];
+
+    options.innerHTML = `
+      <button onclick="selectGroup('${invitedGroupOnly.id}', '${invitedGroupOnly.nombre.replace(/'/g, "\\'")}')" 
+        class="w-full flex justify-between items-center px-4 py-3 text-left hover:bg-[#2f4349] text-white">
+        <span>${invitedGroupOnly.nombre}</span>
+        <span class="text-yellow-400 font-bold">✓</span>
+      </button>
+    `;
+
+    selectedText.innerText = invitedGroupOnly.nombre;
+    return;
+  }
+
   const { data: groups, error } = await db
     .from('grupos')
     .select('*')
@@ -180,11 +203,6 @@
   }
 
   allGroups = groups || [];
-
-  const options = document.getElementById('group-options');
-  const selectedText = document.getElementById('grupo-seleccionado-texto');
-
-  options.innerHTML = '';
 
   options.innerHTML += `
     <button onclick="selectGroup('', 'Sin grupo')" 
@@ -476,6 +494,7 @@ function showGroupCreatedToast() {
 
   currentGroupId = data.id;
   currentGroupName = data.nombre;
+  invitedGroupOnly = data;
 
   localStorage.setItem('grupo_id', currentGroupId);
   localStorage.setItem('grupo_nombre', currentGroupName);
